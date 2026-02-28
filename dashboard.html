@@ -1437,7 +1437,7 @@
             </button>
         </div>
     </div>
-    <script>
+        <script>
 
     // VARIÁVEIS GLOBAIS
     let currentUser = null;
@@ -1447,74 +1447,21 @@
     // URL DA PLANILHA CSV
     const REGISTRO_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/pub?gid=195449004&single=true&output=csv';
 
-   // FUNÇÃO DE AUTENTICAÇÃO (CORRIGIDA)
+   // FUNÇÃO DE AUTENTICAÇÃO
 function checkAuth() {
-    // 1. Pega os dados do usuário salvos no sessionStorage pelo login
     const userData = sessionStorage.getItem('vlt_user');
-
-    // 2. Verifica se os dados existem. Se não, redireciona para o login.
     if (!userData) {
         window.location.href = 'index.html';
-        return null; // Retorna null para indicar que não há usuário
+        return null;
     }
-
-    // 3. Converte os dados de string para objeto
     const user = JSON.parse(userData);
-
-    // 4. Retorna o objeto do usuário para ser usado no dashboard
     return user;
 }
 
-    // INICIALIZAÇÃO (mantida)
+    // INICIALIZAÇÃO
     document.addEventListener('DOMContentLoaded', function() {
         console.log("🚀 Inicializando Dashboard SIGMA-MRO...");
         currentUser = checkAuth();
-                // ==========================================
-        // CORREÇÃO DE NAVEGAÇÃO (SIGMA HELP)
-        // ==========================================
-        
-        function checkUrlHash() {
-            // Lê o que está depois do # na URL (ex: #laboratorio)
-            const hash = window.location.hash; 
-            
-            if (hash) {
-                const pageId = hash.replace('#', '');
-                
-                // Verifica se a página existe antes de tentar abrir
-                const targetPage = document.getElementById('page-' + pageId);
-                
-                if (targetPage) {
-                    // Abre a aba chamando a função que já existe no sistema
-                    showPage(pageId, null);
-                    
-                    // Atualiza o título superior para não parecer que recarregou tudo
-                    const breadcrumb = document.getElementById('breadcrumb');
-                    if(breadcrumb) {
-                        const titulos = {
-                            'dashboard': '📊 Dashboard',
-                            'plantao': '🕒 Plantão',
-                            'passagem': '📋 Passagem de Serviço',
-                            'novo_registro': '➕ Novo Registro',
-                            'usuarios': '👥 Usuários',
-                            'laboratorio': '🔬 Laboratório',
-                            'eva': '🤖 EVA',
-                            'refrigeracao': '❄️ Refrigeração',
-                            'rastreabilidade': '🚩 Rastreabilidade',
-                            'documentacao': '📒 Documentação',
-                            'catalogo': '📚 Catálogo',
-                            'programacao': '📅 Programação',
-                            'plano_frota': '🚆 Plano de Frota',
-                            'avisos': '📢 Avisos',
-                            'sobre': 'ℹ️ Sobre o VLT'
-                        };
-                        breadcrumb.innerHTML = titulos[pageId] || '📊 Dashboard';
-                    }
-                }
-            }
-        }
-
-        // Executa a verificação assim que a página termina de carregar
-        checkUrlHash();
         if (currentUser) {
             console.log("✅ Usuário autenticado:", currentUser.usuario);
             const usuario = currentUser.usuario;
@@ -1524,7 +1471,6 @@ function checkAuth() {
             document.getElementById('userInitials').textContent = initials;
             if (currentUser.tipo !== 'ADMIN') {
                 document.getElementById('usuarios-menu').style.display = 'none';
-                document.getElementById('relatorios-menu').style.display = 'none';
             }
             loadUserProfile(usuario);
         }
@@ -1535,783 +1481,346 @@ function checkAuth() {
         console.log("✅ Dashboard inicializado com sucesso!");
     });
 
-    // FUNÇÃO PARA CARREGAR PERFIL DO USUÁRIO (mantida)
-    // FUNÇÃO PARA CARREGAR PERFIL DO USUÁRIO (VERSÃO CORRIGIDA)
-// FUNÇÃO PARA CARREGAR PERFIL DO USUÁRIO (VERSÃO FINAL E CORRIGIDA)
+    // FUNÇÃO PARA CARREGAR PERFIL DO USUÁRIO
 function loadUserProfile(usuario) {
-    // A variável 'usuario' vem do checkAuth() e contém o usuário logado.
-    console.log("Tentando carregar perfil para o usuário:", usuario);
-
-    // URL da planilha de usuários (certifique-se de que esta é a URL de "Publicar na web")
     const USUARIOS_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/pub?gid=1605075317&single=true&output=csv';
-
-    // Atualiza o nome de usuário e tipo na barra superior imediatamente
     document.getElementById('userName').textContent = usuario;
     document.getElementById('userRole').textContent = currentUser.tipo;
     const initials = usuario.split('.').map(n => n[0].toUpperCase()).join('');
     document.getElementById('userInitials').textContent = initials;
 
-    // Busca os dados detalhados na planilha
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000); // Timeout de 8 segundos
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
 
     fetch(USUARIOS_CSV, { signal: controller.signal })
-        .then(r => {
-            if (!r.ok) throw new Error('Network response was not ok');
-            return r.text();
-        })
+        .then(r => r.text())
         .then(csv => {
             clearTimeout(timeoutId);
             const rows = parseCSV(csv);
-            // Procura pelo usuário na coluna 'Usuário' da planilha
             const userRow = rows.find(r => r.Usuário === usuario || r.Usuario === usuario);
-
             if (userRow) {
-                console.log("Dados do usuário encontrados na planilha:", userRow);
-
-                // Extrai os dados da planilha usando os nomes de coluna corretos
-                const nomeCompleto = userRow.Nome_Completo || '-';
-                const email = userRow.Email || '-';
+                document.getElementById('perfil-nome').textContent = userRow.Nome_Completo || '-';
+                document.getElementById('perfil-usuario').textContent = usuario;
+                document.getElementById('perfil-email').textContent = userRow.Email || '-';
                 const telefone = userRow.Telefone || '';
-                const endereco = userRow.Endereco || '-';
-                const matricula = userRow.Matrícula || '-';
-                const tipo = userRow.Tipo || currentUser.tipo || '-';
-
-                // Cria o link do WhatsApp se o telefone existir
-                const whatsappLink = telefone ? `<a href="https://wa.me/55${telefone.replace(/\D/g, '')}" target="_blank" class="modal-link"><i class="fab fa-whatsapp"></i> Clique para conversar</a>` : 'Não informado';
-
-                // Preenche o modal "Meu Perfil" com os dados da planilha
-                document.getElementById('perfil-nome').textContent = nomeCompleto;
-                document.getElementById('perfil-usuario').textContent = usuario;
-                document.getElementById('perfil-email').textContent = email;
-                document.getElementById('perfil-telefone').innerHTML = whatsappLink;
-                document.getElementById('perfil-endereco').textContent = endereco;
-                document.getElementById('perfil-matricula').textContent = matricula;
-                document.getElementById('perfil-tipo').textContent = tipo;
-            } else {
-                console.warn("Usuário não encontrado na planilha. Usando dados do login.");
-                // Se não encontrar na planilha, usa os dados do login e preenche o resto com '-'
-                document.getElementById('perfil-nome').textContent = currentUser.nome || usuario;
-                document.getElementById('perfil-usuario').textContent = usuario;
-                document.getElementById('perfil-email').textContent = 'Não informado';
-                document.getElementById('perfil-telefone').textContent = 'Não informado';
-                document.getElementById('perfil-endereco').textContent = 'Não informado';
-                document.getElementById('perfil-matricula').textContent = 'Não informado';
-                document.getElementById('perfil-tipo').textContent = currentUser.tipo || 'USUÁRIO';
+                document.getElementById('perfil-telefone').innerHTML = telefone ? `<a href="https://wa.me/55${telefone.replace(/\D/g, '')}" target="_blank" class="modal-link">Conversar no WhatsApp</a>` : 'Não informado';
+                document.getElementById('perfil-endereco').textContent = userRow.Endereco || '-';
+                document.getElementById('perfil-matrícula').textContent = userRow.Matrícula || '-';
+                document.getElementById('perfil-tipo').textContent = userRow.Tipo || currentUser.tipo;
             }
         })
         .catch(e => {
             clearTimeout(timeoutId);
-            console.error('Erro ao carregar perfil da planilha (usando defaults):', e);
-            // Em caso de erro de rede, preenche com os dados do login
-            document.getElementById('perfil-nome').textContent = currentUser.nome || usuario;
-            document.getElementById('perfil-usuario').textContent = usuario;
-            document.getElementById('perfil-email').textContent = 'Não informado';
-            document.getElementById('perfil-telefone').textContent = 'Não informado';
-            document.getElementById('perfil-endereco').textContent = 'Não informado';
-            document.getElementById('perfil-matricula').textContent = 'Não informado';
-            document.getElementById('perfil-tipo').textContent = currentUser.tipo || 'USUÁRIO';
+            console.error('Erro ao carregar perfil:', e);
         });
 }
 
-    // FUNÇÃO PRINCIPAL PARA MOSTRAR PÁGINAS (mantida)
+    // FUNÇÃO PRINCIPAL PARA MOSTRAR PÁGINAS
     function showPage(pageName, event = null) {
-        console.log("🔄 Navegando para página:", pageName);
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         const targetPage = document.getElementById('page-' + pageName);
-        if (targetPage) {
-            targetPage.classList.add('active');
-            console.log("✅ Página exibida com sucesso");
-        } else {
-            console.error("❌ Página não encontrada:", pageName);
-        }
+        if (targetPage) targetPage.classList.add('active');
 
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        if (event && event.currentTarget) {
-            event.currentTarget.classList.add('active');
-        }
+        if (event && event.currentTarget) event.currentTarget.classList.add('active');
+        
         const titles = {
-    'dashboard': '📊 Dashboard',
-    'plantao': '🕒 Plantão',
-    'passagem': '📋 Passagem de Serviço',
-    'novo_registro': '➕ Novo Registro',
-    'usuarios': '👥 Usuários',
-    'laboratorio': '🧪 Laboratório',
-    'eva': '🤖 EVA',
-    'refrigeracao': '❄️ Refrigeração',
-    'rastreabilidade': '🛰️ Rastreabilidade',
-    'documentacao': '📚 Documentação',
-    'catalogo': '📖 Catálogo',
-    'programacao': '📅 Programação',
-    'plano_frota': '🚆 Plano de Frota',
-    'sobre': 'ℹ️ Sobre o VLT'
-};
-
+            'dashboard': '📊 Dashboard',
+            'plantao': '🕒 Plantão',
+            'passagem': '📋 Passagem de Serviço',
+            'novo_registro': '➕ Novo Registro',
+            'usuarios': '👥 Usuários',
+            'laboratorio': '🔬 Laboratório',
+            'eva': '🤖 EVA',
+            'refrigeracao': '❄️ Refrigeração',
+            'rastreabilidade': '🚩 Rastreabilidade',
+            'documentacao': '📚 Documentação',
+            'catalogo': '📖 Catálogo',
+            'programacao': '📅 Programação',
+            'plano_frota': '🚆 Plano de Frota',
+            'sobre': 'ℹ️ Sobre o VLT'
+        };
         document.getElementById('breadcrumb').textContent = titles[pageName] || pageName;
-        updateMotivationalQuote();
-        const screenshotBtn = document.getElementById('screenshotBtn');
-        if (['documentacao', 'sobre', 'catalogo'].includes(pageName)) {
-        } else {
-            screenshotBtn.style.display = 'none';
-        }
+        
         if (pageName === 'passagem') {
             document.getElementById('passagem-filters').style.display = 'flex';
-            loadPassagemData(); // Carrega os dados quando a página é aberta
         } else {
             document.getElementById('passagem-filters').style.display = 'none';
         }
         if (pageName === 'usuarios') loadUsuarios();
         if (pageName === 'documentacao') loadDocumentacao();
-        if (pageName === 'relatorios') {
-            document.getElementById('relatorio-table').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;">Clique em "Aplicar Filtros" para gerar o relatório</td></tr>';
-        }
     }
 
-    // FUNÇÕES PARA PASSAGEM DE SERVIÇO (CORRIGIDAS E LIMPA)
+    // --- FUNÇÕES DE PASSAGEM DE SERVIÇO ---
+    function openPassagemFilterModal() { document.getElementById('passagemFilterModal').classList.add('show'); }
+    function closePassagemFilterModal() { document.getElementById('passagemFilterModal').classList.remove('show'); }
 
-    // Função para capturar tela
-    function takePassagemScreenshot() {
-        const element = document.getElementById('page-passagem');
-        html2canvas(element, {
-            allowTaint: true,
-            useCORS: true,
-            scale: 2,
-            backgroundColor: '#ffffff'
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
-            link.download = 'VLT_Passagem_Servico_' + new Date().toLocaleString('pt-BR').replace(/[/\\:]/g, '-') + '.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-    }
-
-    // Função para abrir o modal antigo de filtro
-    function openPassagemFilterModal() {
-        document.getElementById('passagemFilterModal').classList.add('show');
-    }
-
-    // Função para fechar o modal antigo de filtro
-    function closePassagemFilterModal() {
-        document.getElementById('passagemFilterModal').classList.remove('show');
-    }
-
-    // Função para aplicar filtro do modal antigo
-    function applyPassagemFilterOld() {
-        const grupo = document.getElementById('passagemGrupoOld').value;
-        const dataStr = document.getElementById('passagemDataOld').value;
-        if (!dataStr) {
-            alert('Por favor, selecione uma data.');
-            return;
-        }
-        document.getElementById('passagemGrupo').value = grupo;
-        document.getElementById('passagemData').value = dataStr;
-        applyPassagemFilters();
-        closePassagemFilterModal();
-    }
-
-// FUNÇÃO PRINCIPAL PARA APLICAR OS FILTROS (ATUALIZADA)
-function applyPassagemFilters() {
-    // Verifica se os dados já foram carregados
-    if (allRegistros.length === 0) {
-        fetch(REGISTRO_CSV).then(r => r.text()).then(csv => {
-            allRegistros = parseCSV(csv);
-            processPassagemFilters();
-        }).catch(error => {
-            console.error('Erro ao carregar planilha:', error);
-            document.getElementById('passagem-table').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:red;">❌ Erro ao carregar dados: ${error.message}</td></tr>`;
-        });
-    } else {
-        processPassagemFilters();
-    }
-}
-
-
-// FUNÇÃO QUE PROCESSA OS FILTROS E ATUALIZA A TABELA (TOTALMENTE REESCRITA)
-function processPassagemFilters() {
-    const opcaoSelecionada = document.querySelector('input[name="filtroDataOpcao"]:checked').value;
-    const grupo = document.getElementById('passagemGrupo').value;
-    const trem = document.getElementById('passagemTrem').value.toLowerCase();
-    const sistema = document.getElementById('passagemSistema').value.toLowerCase();
-    const tecnico = document.getElementById('passagemTecnico').value.toLowerCase();
-    const status = document.getElementById('passagemStatus').value;
-
-    filteredPassagemData = allRegistros.filter(r => {
-        const dataRegistroStr = r['Carimbo de data/hora'] || '';
-        const dataRegistro = parseDateFromCSV(dataRegistroStr); // Converte para objeto Date
-
-        // --- LÓGICA DE FILTRAGEM DE DATA ---
-        let passaNoFiltroDeData = false;
-        const hoje = new Date();
-        hoje.setHours(0, 0, 0, 0); // Zera a hora para comparar apenas datas
-
-        switch (opcaoSelecionada) {
-            case 'especifica':
-                const dataEspecifica = document.getElementById('passagemDataEspecifica').value;
-                if (dataEspecifica) {
-                    const dataFiltro = new Date(dataEspecifica + "T00:00:00");
-                    passaNoFiltroDeData = dataRegistro.toDateString() === dataFiltro.toDateString();
-                } else {
-                    passaNoFiltroDeData = true; // Se não selecionou data, não filtra por data
-                }
-                break;
-
-            case 'periodo':
-                const dataInicioStr = document.getElementById('passagemDataInicio').value;
-                const dataFimStr = document.getElementById('passagemDataFim').value;
-                if (dataInicioStr || dataFimStr) {
-                    const dataInicio = dataInicioStr ? new Date(dataInicioStr + "T00:00:00") : new Date('1900-01-01');
-                    const dataFim = dataFimStr ? new Date(dataFimStr + "T23:59:59") : new Date('2100-12-31');
-                    passaNoFiltroDeData = dataRegistro >= dataInicio && dataRegistro <= dataFim;
-                } else {
-                    passaNoFiltroDeData = true;
-                }
-                break;
-
-            case 'atalho':
-                const atalho = document.getElementById('passagemAtalho').value;
-                if (atalho) {
-                    switch (atalho) {
-                        case 'hoje':
-                            passaNoFiltroDeData = dataRegistro.toDateString() === hoje.toDateString();
-                            break;
-                        case 'ontem':
-                            const ontem = new Date(hoje);
-                            ontem.setDate(ontem.getDate() - 1);
-                            passaNoFiltroDeData = dataRegistro.toDateString() === ontem.toDateString();
-                            break;
-                        case 'ultimos_7_dias':
-                            const seteDiasAtras = new Date(hoje);
-                            seteDiasAtras.setDate(seteDiasAtras.getDate() - 7);
-                            passaNoFiltroDeData = dataRegistro >= seteDiasAtras;
-                            break;
-                        case 'este_mes':
-                            passaNoFiltroDeData = dataRegistro.getMonth() === hoje.getMonth() && dataRegistro.getFullYear() === hoje.getFullYear();
-                            break;
-                    }
-                } else {
-                    passaNoFiltroDeData = true;
-                }
-                break;
-        }
-
-        if (!passaNoFiltroDeData) return false;
-
-        // --- LÓGICA DOS OUTROS FILTROS (MANTIDA) ---
-        if (grupo && r['GRUPO'] !== grupo) return false;
-        if (trem && !r['NÚMERO DO TREM'].toLowerCase().includes(trem)) return false;
-        if (sistema && !r['SISTEMAS'].toLowerCase().includes(sistema)) return false;
-        if (tecnico && !r['NOME E SOBRENOME'].toLowerCase().includes(tecnico)) return false;
-        if (status) {
-            const statusRegistro = (r['STATUS ATUAL DO TREM'] || '').toUpperCase();
-            if (!statusRegistro.includes(status.toUpperCase())) return false;
-        }
-
-        return true;
-    });
-
-    renderPassagemTable();
-}
-
-    // Função para renderizar a tabela
-    function renderPassagemTable() {
-    const table = document.getElementById('passagem-table');
-    if (filteredPassagemData.length === 0) {
-        table.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;">Nenhum registro encontrado para os filtros aplicados.</td></tr>';
-    } else {
-        table.innerHTML = filteredPassagemData.map(r => {
-            const data = r['Carimbo de data/hora'] || '';
-            const nome = r['NOME E SOBRENOME'] || '';
-            const trem = r['NÚMERO DO TREM'] || '';
-            const sistema = r['SISTEMAS'] || '';
-            const tituloFalha = r['TITULO DA FALHA'] || ''; // << NOVA VARIÁVEL
-            const descricao = r['DESCRIÇÃO DETALHADA'] || '';
-            const status = r['STATUS ATUAL DO TREM'] || 'NÃO INFORMADO';
-            return `
-                <tr>
-                    <td>${data}</td>
-                    <td>${nome}</td>
-                    <td>${trem}</td>
-                    <td>${sistema}</td>
-                    <td>${tituloFalha}</td>
-                    <td>${descricao}</td>
-                    <td>${status}</td>
-                </tr>
-            `;
-        }).join('');
-    }
-    }
-
-// FUNÇÃO PARA LIMPAR OS FILTROS (ATUALIZADA)
-function clearPassagemFilters() {
-    // Reseta os botões de rádio para o padrão
-    document.querySelector('input[name="filtroDataOpcao"][value="especifica"]').checked = true;
-    toggleFiltrosData(); // Mostra o campo de data específica
-
-    // Limpa os valores de todos os campos
-    document.getElementById('passagemDataEspecifica').value = '';
-    document.getElementById('passagemDataInicio').value = '';
-    document.getElementById('passagemDataFim').value = '';
-    document.getElementById('passagemAtalho').value = '';
-    document.getElementById('passagemGrupo').value = '';
-    document.getElementById('passagemTrem').value = '';
-    document.getElementById('passagemSistema').value = '';
-    document.getElementById('passagemTecnico').value = '';
-    document.getElementById('passagemStatus').value = '';
-
-    // Limpa os dados filtrados e a tabela
-    filteredPassagemData = [];
-    document.getElementById('passagem-table').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;">Clique em "Aplicar Filtros" para gerar os dados</td></tr>';
-}
-
-// NOVA FUNÇÃO PARA CONTROLAR A VISIBILIDADE DOS CAMPOS DE FILTRO
-function toggleFiltrosData() {
-    const opcaoSelecionada = document.querySelector('input[name="filtroDataOpcao"]:checked').value;
-    const todosOsFiltros = document.querySelectorAll('.filtro-data-content');
-
-    // Esconde todos os containers de filtro de data primeiro
-    todosOsFiltros.forEach(filtro => filtro.style.display = 'none');
-
-    // Mostra apenas o container selecionado
-    switch (opcaoSelecionada) {
-        case 'especifica':
-            document.getElementById('filtroEspecifico').style.display = 'flex';
-            break;
-        case 'periodo':
-            document.getElementById('filtroPeriodo').style.display = 'flex';
-            break;
-        case 'atalho':
-            document.getElementById('filtroAtalho').style.display = 'flex';
-            break;
-    }
-}
-
-// INÍCIO DO NOVO BLOCO DE LEITURA DE DADOS
-
-// FUNÇÃO AUXILIAR PARA CONVERTER A DATA DO CSV (dd/mm/yyyy) PARA OBJETO DATE
-function parseDateFromCSV(dateStr) {
-    if (!dateStr) return new Date(0); // Retorna data inválida se string vazia
-    const parts = dateStr.split(' ')[0].split('/');
-    return new Date(parts[2], parts[1] - 1, parts[0]);
-}
-
-// FUNÇÃO PRINCIPAL PARA FAZER O PARSING DO CSV (VERSÃO CORRIGIDA)
-
-// INÍCIO DO BLOCO DE FUNÇÕES DE LEITURA (VERSÃO ESTÁVEL E RÁPIDA)
-
-// Função auxiliar para juntar linhas quebradas em campos com aspas
-function preProcessCSVLines(csvText) {
-    const rawLines = csvText.split('\n');
-    const processedLines = [];
-    let currentLine = '';
-
-    for (let i = 0; i < rawLines.length; i++) {
-        const line = rawLines[i];
-        currentLine += line;
-
-        // Conta as aspas. Se for um número ímpar, estamos no meio de um campo.
-        const quoteCount = (currentLine.match(/"/g) || []).length;
-        if (quoteCount % 2 === 0) {
-            // Aspas estão balanceadas, esta linha está completa.
-            processedLines.push(currentLine);
-            currentLine = ''; // Reseta para a próxima linha
-        } else {
-            // Aspas não estão balanceadas, a linha continua. Adiciona uma quebra de linha.
-            currentLine += '\n';
-        }
-    }
-    return processedLines;
-}
-
-// Função auxiliar para dividir uma linha já corrigida em colunas
-function parseCSVLine(line) {
-    const result = [];
-    let current = '';
-    let inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        const nextChar = line[i + 1];
-
-        // Lida com aspas duplas dentro de um campo (ex: "texto com ""aspas"" aqui")
-        if (char === '"' && nextChar === '"' && inQuotes) {
-            current += '"';
-            i++; // Pula a próxima aspa
-        } else if (char === '"') {
-            inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-            result.push(current.trim());
-            current = '';
-        } else {
-            current += char;
-        }
-    }
-    result.push(current.trim());
-    return result;
-}
-
-// FUNÇÃO PRINCIPAL - Agora mais simples e rápida
-function parseCSV(csvText) {
-    // Etapa 1: Pré-processa o texto para corrigir as quebras de linha
-    const processedLines = preProcessCSVLines(csvText);
-
-    if (processedLines.length === 0) return [];
-
-    // Etapa 2: Lê os cabeçalhos da primeira linha
-    const headers = parseCSVLine(processedLines[0]);
-
-    // Etapa 3: Lê as linhas de dados
-    const rows = [];
-    for (let i = 1; i < processedLines.length; i++) {
-        const line = processedLines[i];
-        if (line.trim() === '') continue; // Pula linhas vazias
-
-        const values = parseCSVLine(line);
-        const obj = {};
-        headers.forEach((header, idx) => {
-            const cleanHeader = header.trim().replace(/"/g, '');
-            // Limpa o valor: remove aspas das extremidades e espaços
-            const value = values[idx] ? values[idx].trim().replace(/^"|"$/g, '') : '';
-            obj[cleanHeader] = value;
-        });
-        rows.push(obj);
-    }
-    return rows;
-}
-
-// FIM DO BLOCO DE FUNÇÕES DE LEITURA
-
-// FUNÇÃO AUXILIAR PARA DIVIDIR UMA LINHA SIMPLES (não será mais usada pela parseCSV principal, mas mantida por segurança)
-function parseCSVLine(line) {
-    const result = [];
-    let current = '';
-    let inQuotes = false;
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        if (char === '"') {
-            inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-            result.push(current);
-            current = '';
-        } else {
-            current += char;
-        }
-    }
-    result.push(current);
-    return result;
-}
-
-// FIM DO NOVO BLOCO DE LEITURA DE DADOS
-    // FUNÇÕES GERAIS (mantidas)
-    function takeScreenshot() {
-        const element = document.querySelector('.page.active');
-        html2canvas(element, {
-            allowTaint: true,
-            useCORS: true,
-            scale: 2,
-            backgroundColor: '#ffffff'
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
-            link.download = 'VLT_Screenshot_' + new Date().toLocaleString('pt-BR').replace(/[/\\:]/g, '-') + '.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-    }
-    function takePageScreenshot(pageName) {
-        const element = document.getElementById('page-' + pageName);
-        html2canvas(element, {
-            allowTaint: true,
-            useCORS: true,
-            scale: 2,
-            backgroundColor: '#ffffff'
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
-            link.download = 'VLT_' + pageName + '_' + new Date().toLocaleString('pt-BR').replace(/[/\\:]/g, '-') + '.png';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-    }
-    function loadUsuarios() {
-        fetch(USUARIOS_CSV).then(r => r.text()).then(csv => {
-            const rows = parseCSV(csv);
-            const table = document.getElementById('usuarios-table');
-            table.innerHTML = rows.map(r => `
-                <tr>
-                    <td>${r.Usuario || ''}</td>
-                    <td>${r.Nome_Completo || ''}</td>
-                    <td>${r.Email || ''}</td>
-                    <td>${r.Telefone || ''}</td>
-                    <td>${r.Tipo || ''}</td>
-                    <td>${r.Status || 'Ativo'}</td>
-                </tr>
-            `).join('');
-        }).catch(e => {
-            console.error('Erro ao carregar usuários:', e);
-            document.getElementById('usuarios-table').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;">Erro ao carregar usuários.</td></tr>';
-        });
-    }
-    function openProfileModal() {
-        document.getElementById('profileModal').classList.add('show');
-        loadUserProfile(currentUser.usuario);
-    }
-    function closeProfileModal() {
-        document.getElementById('profileModal').classList.remove('show');
-    }
-    function logout() {
-        sessionStorage.removeItem('vlt_user');
-        window.location.href = 'index.html';
-    }
-    function updateMotivationalQuote() {
-        const quote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
-        document.getElementById('motivational-quote').textContent = quote;
-    }
-    // FUNÇÃO QUE ATUALIZA O CRONÔMETRO DE OPERAÇÃO
-function updateOperationClock() {
-    // DATA E HORA EXATAS DO INÍCIO DA OPERAÇÃO COMERCIAL: 05/06/2016 às 12:00
-    const startDate = new Date('2016-06-05T12:00:00');
-    const now = new Date();
-    const diff = now - startDate;
-
-    // Calcula cada unidade de tempo
-    const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
-    const months = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
-    const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-    // Atualiza os elementos na tela com os valores calculados
-    document.getElementById('op-years').textContent = years;
-    document.getElementById('op-months').textContent = months;
-    document.getElementById('op-days').textContent = days;
-    document.getElementById('op-hours').textContent = hours;
-    document.getElementById('op-minutes').textContent = minutes;
-    document.getElementById('op-seconds').textContent = seconds;
-}
-    function searchStation() {
-        const searchTerm = document.getElementById('searchEstacao').value.toLowerCase();
-        const resultDiv = document.getElementById('estacao-result');
-        if (searchTerm.length < 2) {
-            resultDiv.innerHTML = '';
-            return;
-        }
-        let results = [];
-        for (let lineNum in linhasData) {
-            const line = linhasData[lineNum];
-            for (let sigla in line.estacoes) {
-                const nome = line.estacoes[sigla];
-                if (sigla.toLowerCase().includes(searchTerm) || nome.toLowerCase().includes(searchTerm)) {
-                    results.push({ sigla, nome, linha: lineNum, cor: line.cor });
-                }
-            }
-        }
-        if (results.length > 0) {
-            resultDiv.innerHTML = results.map(r => `
-                <div class="estacao-item highlight">
-                    <strong>${r.sigla}</strong> - ${r.nome} (Linha ${r.linha} - ${r.cor})
-                </div>
-            `).join('');
-        } else {
-            resultDiv.innerHTML = '<div class="estacao-item">Nenhuma estação encontrada</div>';
-        }
-    }
-    function showLineStations(lineNum) {
-        const listDiv = document.getElementById('linhas-list');
-        const line = linhasData[lineNum];
-        if (listDiv.style.display === 'none' || listDiv.dataset.currentLine !== lineNum) {
-            listDiv.innerHTML = Object.entries(line.estacoes).map(([sigla, nome]) => `
-                <div class="estacao-item">
-                    <strong>${sigla}</strong> - ${nome}
-                </div>
-            `).join('');
-            listDiv.style.display = 'block';
-            listDiv.dataset.currentLine = lineNum;
-        } else {
-            listDiv.style.display = 'none';
-        }
-    }
-    function applyFilters() {
-        const dataInicio = document.getElementById('filterDataInicio').value;
-        const dataFim = document.getElementById('filterDataFim').value;
-        const trem = document.getElementById('filterTrem').value.toLowerCase();
-        const sistema = document.getElementById('filterSistema').value.toLowerCase();
-        const equipe = document.getElementById('filterEquipe').value.toLowerCase();
-        const tecnico = document.getElementById('filterTecnico').value.toLowerCase();
-        const ios = document.getElementById('filterIOS').value.toLowerCase();
-        const status = document.getElementById('filterStatus').value;
+    function applyPassagemFilters() {
         if (allRegistros.length === 0) {
             fetch(REGISTRO_CSV).then(r => r.text()).then(csv => {
                 allRegistros = parseCSV(csv);
-                processReportFilters();
-            }).catch(console.error);
+                processPassagemFilters();
+            });
         } else {
-            processReportFilters();
+            processPassagemFilters();
         }
     }
-    function processReportFilters() {
-        filteredReportData = allRegistros.filter(r => {
-            const dataRegistro = r['Carimbo de data/hora'] || '';
-            if (dataInicio && dataRegistro < dataInicio) return false;
-            if (dataFim && dataRegistro > dataFim) return false;
-            if (trem && !r['NÚMERO DO TREM'].toLowerCase().includes(trem)) return false;
-            if (sistema && !r['SISTEMAS'].toLowerCase().includes(sistema)) return false;
-            if (equipe && !r['GRUPO'].toLowerCase().includes(equipe)) return false;
-            if (tecnico && !r['NOME E SOBRENOME'].toLowerCase().includes(tecnico)) return false;
-            if (ios && !r['IOS'].toLowerCase().includes(ios)) return false;
-            if (status && !r['STATUS ATUAL DO TREM'].toLowerCase().includes(status.toLowerCase())) return false;
+
+    function processPassagemFilters() {
+        const grupo = document.getElementById('passagemGrupo').value;
+        const status = document.getElementById('passagemStatus').value;
+        // Adicione outros filtros se necessário
+        
+        filteredPassagemData = allRegistros.filter(r => {
+            if (grupo && r['GRUPO'] !== grupo) return false;
+            if (status && !r['STATUS ATUAL DO TREM'].includes(status)) return false;
             return true;
         });
-        renderReportTable();
-        document.getElementById('download-buttons').style.display = 'flex';
+        renderPassagemTable();
     }
-    function renderReportTable() {
-        const table = document.getElementById('relatorio-table');
-        if (filteredReportData.length === 0) {
-            table.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;">Nenhum registro encontrado para os filtros aplicados.</td></tr>';
+
+    function renderPassagemTable() {
+        const table = document.getElementById('passagem-table');
+        if (filteredPassagemData.length === 0) {
+            table.innerHTML = '<tr><td colspan="7">Nenhum registro encontrado.</td></tr>';
         } else {
-            table.innerHTML = filteredReportData.map(r => {
-                return `
-                    <tr>
-                        <td>${r['Carimbo de data/hora'] || ''}</td>
-                        <td>${r['NOME E SOBRENOME'] || ''}</td>
-                        <td>${r['NÚMERO DO TREM'] || ''}</td>
-                        <td>${r['SISTEMAS'] || ''}</td>
-                        <td>${r['IOS'] || ''}</td>
-                        <td>${r['DESCRIÇÃO DETALHADA'] || ''}</td>
-                        <td>${r['STATUS ATUAL DO TREM'] || ''}</td>
-                    </tr>
-                `;
-            }).join('');
+            table.innerHTML = filteredPassagemData.map(r => `
+                <tr>
+                    <td>${r['Carimbo de data/hora'] || ''}</td>
+                    <td>${r['NOME E SOBRENOME'] || ''}</td>
+                    <td>${r['NÚMERO DO TREM'] || ''}</td>
+                    <td>${r['SISTEMAS'] || ''}</td>
+                    <td>${r['TITULO DA FALHA'] || ''}</td>
+                    <td>${r['DESCRIÇÃO DETALHADA'] || ''}</td>
+                    <td>${r['STATUS ATUAL DO TREM'] || ''}</td>
+                </tr>
+            `).join('');
         }
     }
-    function clearFilters() {
-        ['filterDataInicio', 'filterDataFim', 'filterTrem', 'filterSistema', 'filterEquipe', 'filterTecnico', 'filterIOS', 'filterStatus'].forEach(id => document.getElementById(id).value = '');
-        filteredReportData = [];
-        document.getElementById('relatorio-table').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;">Clique em "Aplicar Filtros" para gerar o relatório</td></tr>';
-        document.getElementById('download-buttons').style.display = 'none';
+    
+    function clearPassagemFilters() {
+        document.getElementById('passagemGrupo').value = '';
+        document.getElementById('passagemStatus').value = '';
+        filteredPassagemData = [];
+        document.getElementById('passagem-table').innerHTML = '<tr><td colspan="7">Clique em "Aplicar Filtros"</td></tr>';
     }
-    function downloadCSV() {
-        if (filteredReportData.length === 0) {
-            alert('Nenhum dado para exportar');
-            return;
-        }
-        const headers = ['Data', 'Técnico', 'Trem', 'Sistema', 'IOS', 'Descrição', 'Status'];
-        const rows = filteredReportData.map(r => [
-            r['Carimbo de data/hora'] || '',
-            r['NOME E SOBRENOME'] || '',
-            r['NÚMERO DO TREM'] || '',
-            r['SISTEMAS'] || '',
-            r['IOS'] || '',
-            r['DESCRIÇÃO DETALHADA'] || '',
-            r['STATUS ATUAL DO TREM'] || ''
-        ]);
-        let csvContent = headers.join(',') + '\n';
-        rows.forEach(row => {
-            csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
+
+    // --- FUNÇÕES GERAIS ---
+    function takeScreenshot() {
+        const element = document.querySelector('.page.active');
+        html2canvas(element, { scale: 2 }).then(canvas => {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'VLT_Screenshot.png';
+            link.click();
         });
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'VLT_Relatorio_' + new Date().toLocaleString('pt-BR').replace(/[/\\:]/g, '-') + '.csv';
-        link.click();
     }
-    function downloadPDF() {
-        if (filteredReportData.length === 0) {
-            alert('Nenhum dado para exportar');
-            return;
+    
+    function openProfileModal() { document.getElementById('profileModal').classList.add('show'); }
+    function closeProfileModal() { document.getElementById('profileModal').classList.remove('show'); }
+    function logout() { sessionStorage.removeItem('vlt_user'); window.location.href = 'index.html'; }
+    
+    function updateMotivationalQuote() {
+        const quotes = ["💪 Excelência é a jornada!", "🚆 Segurança em primeiro lugar!", "🛡️ Proteção é responsabilidade de todos!", "⚡ Somos o coração ferroviário do Rio!"];
+        document.getElementById('motivational-quote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
+    }
+    
+    function updateOperationClock() {
+        const startDate = new Date('2016-06-05T12:00:00');
+        const now = new Date();
+        const diff = now - startDate;
+        document.getElementById('op-years').textContent = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+        document.getElementById('op-months').textContent = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
+        document.getElementById('op-days').textContent = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+        document.getElementById('op-hours').textContent = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        document.getElementById('op-minutes').textContent = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        document.getElementById('op-seconds').textContent = Math.floor((diff % (1000 * 60)) / 1000);
+    }
+
+    // --- PARSING CSV (IGNORA FORMATAÇÃO) ---
+    function parseCSV(csvText) {
+        const lines = csvText.split('\n');
+        const headers = parseCSVLine(lines[0]);
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (lines[i].trim() === '') continue;
+            const values = parseCSVLine(lines[i]);
+            const obj = {};
+            headers.forEach((h, idx) => {
+                obj[h.trim()] = values[idx] ? values[idx].trim() : '';
+            });
+            rows.push(obj);
         }
-        const element = document.getElementById('page-relatorios');
-        html2pdf()
-            .from(element)
-            .set({
-                margin: 10,
-                filename: 'VLT_Relatorio_' + new Date().toLocaleString('pt-BR').replace(/[/\\:]/g, '-') + '.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-            })
-            .save();
+        return rows;
     }
-    function toggleSidebar() {
-        document.querySelector('.sidebar').classList.toggle('collapsed');
-    }
-    function handleIframeLoad(loadingId) {
-        console.log("✅ Iframe carregado com sucesso:", loadingId);
-        document.getElementById(loadingId).classList.add('hidden');
-    }
-    function handleIframeError(pageId, formUrl) {
-        console.error("❌ Erro ao carregar iframe para:", pageId);
-        const loadingOverlay = document.getElementById('loading-' + pageId.split('-')[1]);
-        if (loadingOverlay) {
-            loadingOverlay.classList.add('hidden');
-        }
-        const iframeContainer = document.getElementById(pageId).querySelector('.form-container');
-        if (iframeContainer) {
-            const iframe = iframeContainer.querySelector('iframe');
-            if (iframe) {
-                iframe.style.display = 'none';
+
+    function parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(current);
+                current = '';
+            } else {
+                current += char;
             }
-            iframeContainer.innerHTML = `
-                <div class="fallback-container">
-                    <div class="fallback-message">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: var(--warning); margin-bottom: 20px;"></i>
-                        <h3 style="color: var(--dark); margin-bottom: 10px;">Formulário não disponível no iframe</h3>
-                        <p style="color: #666; line-height: 1.5; max-width: 600px;">
-                            Por motivos de segurança, o Google bloqueou a incorporação deste formulário.
-                            Clique no botão abaixo para abrir o formulário em uma nova aba.
-                        </p>
-                    </div>
-                    <button class="fallback-btn" onclick="window.open('${formUrl}', '_blank')">
-                        <i class="fas fa-external-link-alt"></i> Abrir Formulário em Nova Aba
-                    </button>
-                </div>
-            `;
         }
+        result.push(current);
+        return result;
     }
-    function openSupportModal() {
-        document.getElementById('supportModal').classList.add('show');
+
+    // --- OUTRAS FUNÇÕES AUXILIARES ---
+    function loadUsuarios() {
+        fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/pub?gid=1605075317&single=true&output=csv')
+            .then(r => r.text())
+            .then(csv => {
+                const rows = parseCSV(csv);
+                document.getElementById('usuarios-table').innerHTML = rows.map(r => `
+                    <tr>
+                        <td>${r.Usuario || ''}</td>
+                        <td>${r.Nome_Completo || ''}</td>
+                        <td>${r.Email || ''}</td>
+                        <td>${r.Telefone || ''}</td>
+                        <td>${r.Tipo || ''}</td>
+                        <td>${r.Status || 'Ativo'}</td>
+                    </tr>
+                `).join('');
+            });
     }
-    function closeSupportModal() {
-        document.getElementById('supportModal').classList.remove('show');
-    }
+
     function loadDocumentacao() {
-        const container = document.getElementById('documents-list');
-        if (!documentosPDF || documentosPDF.length === 0) {
-            container.innerHTML = `<div style="text-align: center; padding: 40px; color: #666;">
-                <i class="fas fa-folder-open" style="font-size: 48px; margin-bottom: 20px;"></i>
-                <p>Nenhum documento encontrado.</p>
-            </div>`;
-            return;
-        }
-        container.innerHTML = documentosPDF.map(doc => `
-            <div class="document-card" data-category="${doc.categoria}" data-name="${doc.nome.toLowerCase()}">
-                <div class="document-icon">
-                    <i class="fas fa-file-pdf"></i>
-                </div>
-                <div class="document-title">${doc.nome}</div>
-                <div class="document-info">
-                    <div><i class="fas fa-tag"></i> ${doc.categoria}</div>
-                    <div><i class="fas fa-file"></i> ${doc.tamanho || 'Tamanho não informado'}</div>
-                    <div><i class="fas fa-info-circle"></i> ${doc.descricao}</div>
-                </div>
-                <div class="document-actions">
-                    <button class="document-btn view" onclick="viewDocument('${doc.arquivo}')">
-                        <i class="fas fa-eye"></i> Visualizar
-                    </button>
-                    <button class="document-btn download" onclick="downloadDocument('${doc.arquivo}', '${doc.nome}')">
-                        <i class="fas fa-download"></i> Download
-                    </button>
-                </div>
+        const docs = [
+            { nome: "CÓDIGO DE FALHAS ECOPACK", descricao: "LISTA DE FALHAS", arquivo: "PDF/1525MI falhas.pdf", categoria: "MANUTENÇÃO" },
+            { nome: "Lista IOS", descricao: "LISTA COM IOS", arquivo: "PDF/Lista IOS.pdf", categoria: "MANUTENÇÃO" }
+        ];
+        document.getElementById('documents-list').innerHTML = docs.map(d => `
+            <div class="document-card">
+                <div class="document-title">${d.nome}</div>
+                <button class="btn-primary" onclick="window.open('${d.arquivo}')">Abrir</button>
             </div>
         `).join('');
     }
-    function viewDocument(filePath) {
-        window.open(filePath, '_blank');
+
+    // --- CÓDIGO DO CATÁLOGO (CORRIGIDO PARA LER COLUNAS A E B) ---
+    
+    // Variável para armazenar os dados do catálogo
+    let catalogData = [];
+
+    // Função que processa os dados vindos do Google Sheets
+    function loadCatalogData(json) {
+        catalogData = [];
+        // O Google Sheets retorna os dados em 'rows'
+        const rows = json.table.rows;
+
+        rows.forEach(row => {
+            // Pegando os dados das colunas pela posição (c[0] = Coluna A, c[1] = Coluna B, c[2] = Coluna C)
+            // Verifica se a linha existe e tem dados na primeira coluna
+            if (row.c && row.c[0] && row.c[0].v !== undefined && row.c[0].v !== null) {
+                
+                // Pega o valor bruto (v)
+                let codigo = row.c[0].v; 
+                let nome = row.c[1] && row.c[1].v ? row.c[1].v : '-';
+                let link = row.c[2] && row.c[2].v ? row.c[2].v : '';
+
+                // Tratamento especial: se o código for numérico (ex: 5017158), converte para string
+                if (typeof codigo === 'number') {
+                    codigo = codigo.toString();
+                }
+
+                catalogData.push({
+                    codigo: codigo,
+                    nome: nome,
+                    link: link
+                });
+            }
+        });
+
+        console.log("Catálogo carregado:", catalogData.length, "itens");
+        renderCatalogTable(catalogData);
     }
+
+    // Função para desenhar a tabela
+    function renderCatalogTable(data) {
+        const tbody = document.getElementById('catalogTableBody');
+        tbody.innerHTML = '';
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum material encontrado.</td></tr>';
+            return;
+        }
+
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            const itemJson = JSON.stringify(item).replace(/'/g, "\\'");
+            
+            tr.innerHTML = `
+                <td>${item.codigo}</td>
+                <td>${item.nome}</td>
+                <td><button class="btn-catalog-action" onclick='openCatalogModal(${itemJson})'>Ver Detalhes</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Função de Pesquisa (Filtra por Código OU Nome)
+    function filterCatalog() {
+        const term = document.getElementById('catalogSearchInput').value.toLowerCase().trim();
+        
+        if (!term) {
+            renderCatalogTable(catalogData);
+            return;
+        }
+
+        const filtered = catalogData.filter(item => {
+            const codStr = String(item.codigo).toLowerCase();
+            const nomStr = String(item.nome).toLowerCase();
+            // Retorna verdadeiro se achar o termo no código OU no nome
+            return codStr.includes(term) || nomStr.includes(term);
+        });
+
+        renderCatalogTable(filtered);
+    }
+
+    // Funções do Modal
+    function openCatalogModal(item) {
+        document.getElementById('catalogModalTitle').innerText = item.nome;
+        document.getElementById('catalogModalCode').innerText = item.codigo;
+        
+        const imgDiv = document.getElementById('catalogModalImageDiv');
+        
+        if (item.link && item.link !== 'null' && item.link.trim() !== '') {
+            imgDiv.innerHTML = `<img src="${item.link}" class="catalog-modal-image" onerror="this.outerHTML='<p style=color:red>Erro ao carregar imagem</p>'">`;
+        } else {
+            imgDiv.innerHTML = '<p style="color:#888; margin-top:20px;">Sem imagem cadastrada.</p>';
+        }
+        
+        document.getElementById('catalogModal').style.display = 'block';
+    }
+
+    function closeCatalogModal() {
+        document.getElementById('catalogModal').style.display = 'none';
+    }
+
+    // Carrega os dados reais do Google Sheets ao abrir a página
+    window.onload = function() {
+        var script = document.createElement('script');
+        script.src = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/tq?tqx=out:json&callback=loadCatalogData&gid=281666011';
+        document.body.appendChild(script);
+    };
+
+    // Fechar modal clicando fora
+    window.onclick = function(event) {
+        const modal = document.getElementById('catalogModal');
+        if (event.target == modal) {
+            closeCatalogModal();
+        }
+    }
+
+    </script>
     function downloadDocument(filePath, fileName) {
         const link = document.createElement('a');
         link.href = filePath;
@@ -2639,5 +2148,348 @@ window.onclick = function(event) {
 })();
 
 </script>
+function filterCatalog() {
+    const term = document.getElementById('catalogSearchInput').value.toLowerCase();
+    const filtered = catalogData.filter(item => {
+        const codStr = String(item.codigo).toLowerCase();
+        const nomStr = String(item.nome).toLowerCase();
+        return codStr.includes(term) || nomStr.includes(term);
+    });
+    renderCatalogTable(filtered);
+}
+
+// 4. Funções do Modal
+function openCatalogModal(item) {
+    document.getElementById('catalogModalTitle').innerText = item.nome;
+    document.getElementById('catalogModalCode').innerText = item.codigo;
+    
+    const imgDiv = document.getElementById('catalogModalImageDiv');
+    
+    if (item.link && item.link !== 'null' && item.link.trim() !== '') {
+        imgDiv.innerHTML = `<img src="${item.link}" class="catalog-modal-image" onerror="this.outerHTML='<p style=color:red>Erro ao carregar imagem</p>'">`;
+    } else {
+        imgDiv.innerHTML = '<p style="color:#888;">Sem imagem cadastrada.</p>';
+    }
+    
+    document.getElementById('catalogModal').style.display = 'block';
+}
+
+function closeCatalogModal() {
+    document.getElementById('catalogModal').style.display = 'none';
+}
+
+// Fechar clicando fora
+window.onclick = function(event) {
+    if (event.target.id === 'catalogModal') {
+        closeCatalogModal();
+    }
+};
+
+// 5. Injetar o Script do Google Sheets (Carrega os dados reais)
+(function() {
+    var script = document.createElement('script');
+    // Link da sua planilha formatado para JSON
+    script.src = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/tq?tqx=out:json&callback=loadCatalogData&gid=281666011';
+    document.body.appendChild(script);
+})();
+
+</script>na; i++) {
+            container.appendChild(document.createElement('div'));
+        }
+        for (let dia = 1; dia <= diasNoMes; dia++) {
+            const div = document.createElement('div');
+            div.innerHTML = gerarDiaPlantao(dia, mes, ano);
+            container.appendChild(div);
+        }
+    }
+    function mudarMesPlantao(delta) {
+        const input = document.getElementById('mes-plantao');
+        let [ano, mes] = input.value.split('-').map(Number);
+        mes += delta;
+        if (mes > 12) { mes = 1; ano++; }
+        if (mes < 1) { mes = 12; ano--; }
+        input.value = `${ano}-${String(mes).padStart(2, '0')}`;
+        atualizarCalendarioPlantao();
+    }
+    function plantaoHoje() {
+        const hoje = new Date();
+        const mes = hoje.getMonth() + 1;
+        const ano = hoje.getFullYear();
+        const input = document.getElementById('mes-plantao');
+        if (input) {
+            input.value = `${ano}-${String(mes).padStart(2, '0')}`;
+            atualizarCalendarioPlantao();
+        }
+    }
+    // BLOCO DE INICIALIZAÇÃO DA PÁGINA (CORRIGIDO E COMPLETO)
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("🚀 Inicializando Dashboard SIGMA.MRO...");
+
+    // 1. Verifica a autenticação do usuário
+    currentUser = checkAuth();
+    if (currentUser) {
+        console.log("✅ Usuário autenticado:", currentUser.usuario);
+        const usuario = currentUser.usuario;
+        document.getElementById('userName').textContent = usuario;
+        document.getElementById('userRole').textContent = currentUser.tipo;
+        const initials = usuario.split('.').map(n => n[0].toUpperCase()).join('');
+        document.getElementById('userInitials').textContent = initials;
+        if (currentUser.tipo !== 'ADMIN') {
+            document.getElementById('usuarios-menu').style.display = 'none';
+        }
+        loadUserProfile(usuario);
+    }
+
+    // 2. INICIA O CRONÔMETRO DE OPERAÇÃO
+    updateOperationClock(); // Chama a função uma vez para não começar do zero
+    setInterval(updateOperationClock, 1000); // Repete a função a cada segundo
+
+    // 3. Inicia as outras funcionalidades
+    updateMotivationalQuote();
+    setInterval(updateMotivationalQuote, 30000);
+
+    // 4. Inicia o calendário do plantão se a página já estiver ativa
+    if (document.getElementById('page-plantao').classList.contains('active')) {
+        atualizarCalendarioPlantao();
+    }
+
+    console.log("✅ Dashboard inicializado com sucesso!");
+});
+
+    console.log("🎯 JavaScript carregado com sucesso!");
+
+// ==========================================
+// SISTEMA DO CATÁLOGO (ESTILO SIGMA HELP)
+// ==========================================
+
+// Variável global para guardar os dados da planilha
+let catalogData = [];
+
+// 1. Função chamada pelo Google Sheets automaticamente
+function loadCatalogData(json) {
+    const rows = json.table.rows;
+    catalogData = [];
+
+    rows.forEach(row => {
+        if (row.c[0]) { // Se tiver código SAP
+            catalogData.push({
+                codigo: row.c[0].v,
+                nome: row.c[1] ? row.c[1].v : '-',
+                link: row.c[2] ? row.c[2].v : ''
+            });
+        }
+    });
+
+    renderCatalogTable(catalogData);
+}
+
+// 2. Desenhar a tabela na tela
+function renderCatalogTable(data) {
+    const tbody = document.getElementById('catalogTableBody');
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum resultado encontrado.</td></tr>';
+        return;
+    }
+
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        // O 'replace' evita erros com aspas nos nomes
+        const itemJson = JSON.stringify(item).replace(/'/g, "\\'");
+        
+        tr.innerHTML = `
+            <td>${item.codigo}</td>
+            <td>${item.nome}</td>
+            <td><button class="btn-catalog-action" onclick='openCatalogModal(${itemJson})'>Ver Detalhes</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// 3. Função de Pesquisa
+function filterCatalog() {
+    const term = document.getElementById('catalogSearchInput').value.toLowerCase();
+    const filtered = catalogData.filter(item => {
+        const codStr = String(item.codigo).toLowerCase();
+        const nomStr = String(item.nome).toLowerCase();
+        return codStr.includes(term) || nomStr.includes(term);
+    });
+    renderCatalogTable(filtered);
+}
+
+// 4. Funções do Modal
+function openCatalogModal(item) {
+    document.getElementById('catalogModalTitle').innerText = item.nome;
+    document.getElementById('catalogModalCode').innerText = item.codigo;
+    
+    const imgDiv = document.getElementById('catalogModalImageDiv');
+    
+    if (item.link && item.link !== 'null' && item.link.trim() !== '') {
+        imgDiv.innerHTML = `<img src="${item.link}" class="catalog-modal-image" onerror="this.outerHTML='<p style=color:red>Erro ao carregar imagem</p>'">`;
+    } else {
+        imgDiv.innerHTML = '<p style="color:#888;">Sem imagem cadastrada.</p>';
+    }
+    
+    document.getElementById('catalogModal').style.display = 'block';
+}
+
+function closeCatalogModal() {
+    document.getElementById('catalogModal').style.display = 'none';
+}
+
+// Fechar clicando fora
+window.onclick = function(event) {
+    if (event.target.id === 'catalogModal') {
+        closeCatalogModal();
+    }
+};
+
+// 5. Injetar o Script do Google Sheets (Carrega os dados reais)
+(function() {
+    var script = document.createElement('script');
+    // Link da sua planilha formatado para JSON
+    script.src = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/tq?tqx=out:json&callback=loadCatalogData&gid=281666011';
+    document.body.appendChild(script);
+})();
+
+</script>t-size: 10px; color: #666; margin-top: 5px;">${tipoDia}</div>`;
+        const ehDiaUtil = diaSemana >= 1 && diaSemana <= 5;
+        if (ehDiaUtil) {
+            const membros5x2Diurno = formatarMembros(getMembros('5x2', 'diurno'));
+            conteudo += `
+                <div style="background-color: #FFF3E0; color: #EF6C00; padding: 6px; border-radius: 4px; margin: 4px 0; font-size: 11px;">
+                    <strong>🕗 5x2 Diurno</strong><br><small>${membros5x2Diurno}</small>
+                </div>
+            `;
+            const membros5x2Noturno = formatarMembros(getMembros('5x2', 'noturno'));
+            conteudo += `
+                <div style="background-color: #E1F5FE; color: #0277BD; padding: 6px; border-radius: 4px; margin: 4px 0; font-size: 11px;">
+                    <strong>🌙 5x2 Noturno</strong><br><small>${membros5x2Noturno}</small>
+                </div>
+            `;
+            const membrosPrev = formatarMembros(getMembros('PREV', 'noturno'));
+            conteudo += `
+                <div style="background-color: #FCE4EC; color: #C2185B; padding: 6px; border-radius: 4px; margin: 4px 0; font-size: 11px;">
+                    <strong>🛡️ Preventiva</strong><br><small>${membrosPrev}</small>
+                </div>
+            `;
+        }
+        return `
+            <div style="border: 2px solid ${corBorda}; border-radius: 8px; padding: 12px; background: ${corFundo}; min-height: 140px; font-family: 'Segoe UI', sans-serif;">
+                ${conteudo}
+            </div>
+        `;
+    }
+    function atualizarCalendarioPlantao() {
+        const input = document.getElementById('mes-plantao');
+        const [anoStr, mesStr] = input.value.split('-');
+        const ano = parseInt(anoStr);
+        const mes = parseInt(mesStr) - 1;
+        const container = document.getElementById('calendario-plantao');
+        const cabecalho = Array.from(container.children).slice(0, 7);
+        while (container.children.length > 7) {
+            container.removeChild(container.lastChild);
+        }
+        const data = new Date(ano, mes, 1);
+        const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+        const inicioSemana = data.getDay();
+        for (let i = 0; i < inicioSemana; i++) {
+            container.appendChild(document.createElement('div'));
+        }
+        for (let dia = 1; dia <= diasNoMes; dia++) {
+            const div = document.createElement('div');
+            div.innerHTML = gerarDiaPlantao(dia, mes, ano);
+            container.appendChild(div);
+        }
+    }
+    function mudarMesPlantao(delta) {
+        const input = document.getElementById('mes-plantao');
+        let [ano, mes] = input.value.split('-').map(Number);
+        mes += delta;
+        if (mes > 12) { mes = 1; ano++; }
+        if (mes < 1) { mes = 12; ano--; }
+        input.value = `${ano}-${String(mes).padStart(2, '0')}`;
+        atualizarCalendarioPlantao();
+    }
+    function plantaoHoje() {
+        const hoje = new Date();
+        const mes = hoje.getMonth() + 1;
+        const ano = hoje.getFullYear();
+        const input = document.getElementById('mes-plantao');
+        if (input) {
+            input.value = `${ano}-${String(mes).padStart(2, '0')}`;
+            atualizarCalendarioPlantao();
+        }
+    }
+    // BLOCO DE INICIALIZAÇÃO DA PÁGINA (CORRIGIDO E COMPLETO)
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("🚀 Inicializando Dashboard SIGMA.MRO...");
+
+    // 1. Verifica a autenticação do usuário
+    currentUser = checkAuth();
+    if (currentUser) {
+        console.log("✅ Usuário autenticado:", currentUser.usuario);
+        const usuario = currentUser.usuario;
+        document.getElementById('userName').textContent = usuario;
+        document.getElementById('userRole').textContent = currentUser.tipo;
+        const initials = usuario.split('.').map(n => n[0].toUpperCase()).join('');
+        document.getElementById('userInitials').textContent = initials;
+        if (currentUser.tipo !== 'ADMIN') {
+            document.getElementById('usuarios-menu').style.display = 'none';
+        }
+        loadUserProfile(usuario);
+    }
+
+    // 2. INICIA O CRONÔMETRO DE OPERAÇÃO
+    updateOperationClock(); // Chama a função uma vez para não começar do zero
+    setInterval(updateOperationClock, 1000); // Repete a função a cada segundo
+
+    // 3. Inicia as outras funcionalidades
+    updateMotivationalQuote();
+    setInterval(updateMotivationalQuote, 30000);
+
+    // 4. Inicia o calendário do plantão se a página já estiver ativa
+    if (document.getElementById('page-plantao').classList.contains('active')) {
+        atualizarCalendarioPlantao();
+    }
+
+    console.log("✅ Dashboard inicializado com sucesso!");
+});
+
+    console.log("🎯 JavaScript carregado com sucesso!");
+
+// ==========================================
+// SISTEMA DO CATÁLOGO (ESTILO SIGMA HELP)
+// ==========================================
+
+// Variável global para guardar os dados da planilha
+let catalogData = [];
+
+// 1. Função chamada pelo Google Sheets automaticamente
+function loadCatalogData(json) {
+    const rows = json.table.rows;
+    catalogData = [];
+
+    rows.forEach(row => {
+        if (row.c[0]) { // Se tiver código SAP
+            catalogData.push({
+                codigo: row.c[0].v,
+                nome: row.c[1] ? row.c[1].v : '-',
+                link: row.c[2] ? row.c[2].v : ''
+            });
+        }
+    });
+
+    renderCatalogTable(catalogData);
+}
+
+// 2. Desenhar a tabela na tela
+function renderCatalogTable(data) {
+    const tbody = document.getElementById('catalogTableBody');
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+        tbody.inne
 </body>
 </html>
