@@ -864,7 +864,61 @@
 }
 
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+/* --- ESTILO DO CATÁLOGO (IGUAL SIGMA HELP) --- */
+.catalog-search-box {
+    padding: 0 20px;
+    margin-bottom: 15px;
+}
+.catalog-search-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+.catalog-table-container {
+    padding: 0 20px;
+    overflow-x: auto;
+}
+.catalog-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+.catalog-table th, .catalog-table td {
+    border: 1px solid var(--border-color);
+    padding: 8px;
+    text-align: left;
+}
+.catalog-table th {
+    background-color: var(--bg-secondary);
+}
+.catalog-table tr:hover {
+    background-color: rgba(0,0,0,0.03);
+}
+.btn-catalog-action {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.btn-catalog-action:hover {
+    opacity: 0.8;
+}
+.catalog-modal-body {
+    text-align: center;
+    padding: 20px;
+}
+.catalog-modal-image {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
 </head>
 <body>
     <div class="container">
@@ -1539,42 +1593,43 @@
 <div class="page" id="page-catalogo">
     <div class="page-header">
         <h1>📚 Catálogo de Materiais</h1>
-        <p>Digite o código SAP ou nome do equipamento para pesquisar.</p>
+        <p>Pesquise pelo código ou nome do equipamento.</p>
     </div>
 
-    <!-- BARRA DE PESQUISA -->
-    <div class="search-container" style="margin: 20px 0;">
-        <input type="text" id="catalogSearchInput" placeholder="Pesquisar (Código ou Nome)..." onkeyup="filterCatalog()" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+    <!-- Barra de Pesquisa -->
+    <div class="catalog-search-box">
+        <input type="text" id="catalogSearchInput" class="catalog-search-input" placeholder="Digite o código ou nome para buscar..." onkeyup="filterCatalog()">
     </div>
 
-    <!-- TABELA DE RESULTADOS -->
-    <div class="catalog-container" style="overflow-x: auto;">
-        <table class="catalog-table" id="catalogTable">
+    <!-- Tabela de Resultados -->
+    <div class="catalog-table-container">
+        <table class="catalog-table">
             <thead>
                 <tr>
                     <th>Código SAP</th>
                     <th>Nome do Material</th>
-                    <th>Ação</th>
+                    <th style="width: 100px;">Ação</th>
                 </tr>
             </thead>
-            <tbody id="catalogBody">
-                <!-- Os resultados da pesquisa aparecerão aqui -->
-                <tr><td colspan="3" style="text-align:center;">Carregando dados da planilha...</td></tr>
+            <tbody id="catalogTableBody">
+                <tr><td colspan="3" style="text-align:center;">Carregando dados...</td></tr>
             </tbody>
         </table>
     </div>
 
-    <!-- MODAL (Janela de Diálogo para mostrar a Imagem) -->
-    <div id="catalogModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);">
-        <div class="modal-content" style="background-color: #fff; margin: 5% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 600px; position: relative;">
-            <span onclick="closeCatalogModal()" style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; font-weight: bold;">&times;</span>
-            
-            <div style="text-align: center;">
-                <h2 id="modalTitle" style="margin-bottom: 5px;"></h2>
-                <h4 id="modalCode" style="color: #666; margin-top: 0;"></h4>
-                <hr>
-                <div id="modalImageContainer">
-                    <!-- A imagem aparecerá aqui -->
+    <!-- Modal de Detalhes (Igual Sigma Help) -->
+    <div id="catalogModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="catalogModalTitle">Detalhes do Material</h2>
+                <button class="modal-close-btn" onclick="closeCatalogModal()">&times;</button>
+            </div>
+            <div class="modal-body catalog-modal-body">
+                <h3 style="color: #666; font-size: 14px;">CÓDIGO SAP</h3>
+                <h2 id="catalogModalCode" style="margin: 5px 0 20px 0; color: var(--primary-color);">-</h2>
+                
+                <div id="catalogModalImageDiv">
+                    <!-- Imagem aparece aqui -->
                 </div>
             </div>
         </div>
@@ -3380,6 +3435,101 @@ function showMaterialDetails(material) {
 
     modal.classList.add('show');
 }
+
+// ==========================================
+// SISTEMA DO CATÁLOGO (ESTILO SIGMA HELP)
+// ==========================================
+
+// Variável global para guardar os dados da planilha
+let catalogData = [];
+
+// 1. Função chamada pelo Google Sheets automaticamente
+function loadCatalogData(json) {
+    const rows = json.table.rows;
+    catalogData = [];
+
+    rows.forEach(row => {
+        if (row.c[0]) { // Se tiver código SAP
+            catalogData.push({
+                codigo: row.c[0].v,
+                nome: row.c[1] ? row.c[1].v : '-',
+                link: row.c[2] ? row.c[2].v : ''
+            });
+        }
+    });
+
+    renderCatalogTable(catalogData);
+}
+
+// 2. Desenhar a tabela na tela
+function renderCatalogTable(data) {
+    const tbody = document.getElementById('catalogTableBody');
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum resultado encontrado.</td></tr>';
+        return;
+    }
+
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        // O 'replace' evita erros com aspas nos nomes
+        const itemJson = JSON.stringify(item).replace(/'/g, "\\'");
+        
+        tr.innerHTML = `
+            <td>${item.codigo}</td>
+            <td>${item.nome}</td>
+            <td><button class="btn-catalog-action" onclick='openCatalogModal(${itemJson})'>Ver Detalhes</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// 3. Função de Pesquisa
+function filterCatalog() {
+    const term = document.getElementById('catalogSearchInput').value.toLowerCase();
+    const filtered = catalogData.filter(item => {
+        const codStr = String(item.codigo).toLowerCase();
+        const nomStr = String(item.nome).toLowerCase();
+        return codStr.includes(term) || nomStr.includes(term);
+    });
+    renderCatalogTable(filtered);
+}
+
+// 4. Funções do Modal
+function openCatalogModal(item) {
+    document.getElementById('catalogModalTitle').innerText = item.nome;
+    document.getElementById('catalogModalCode').innerText = item.codigo;
+    
+    const imgDiv = document.getElementById('catalogModalImageDiv');
+    
+    if (item.link && item.link !== 'null' && item.link.trim() !== '') {
+        imgDiv.innerHTML = `<img src="${item.link}" class="catalog-modal-image" onerror="this.outerHTML='<p style=color:red>Erro ao carregar imagem</p>'">`;
+    } else {
+        imgDiv.innerHTML = '<p style="color:#888;">Sem imagem cadastrada.</p>';
+    }
+    
+    document.getElementById('catalogModal').style.display = 'block';
+}
+
+function closeCatalogModal() {
+    document.getElementById('catalogModal').style.display = 'none';
+}
+
+// Fechar clicando fora
+window.onclick = function(event) {
+    if (event.target.id === 'catalogModal') {
+        closeCatalogModal();
+    }
+};
+
+// 5. Injetar o Script do Google Sheets (Carrega os dados reais)
+(function() {
+    var script = document.createElement('script');
+    // Link da sua planilha formatado para JSON
+    script.src = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/tq?tqx=out:json&callback=loadCatalogData&gid=281666011';
+    document.body.appendChild(script);
+})();
 
 </script>
 </body>
