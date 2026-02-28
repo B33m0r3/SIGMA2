@@ -1437,85 +1437,96 @@
             </button>
         </div>
     </div>
-        <script>
-
+<script>
+    // ==========================================
     // VARIÁVEIS GLOBAIS
+    // ==========================================
     let currentUser = null;
     let allRegistros = [];
     let filteredPassagemData = [];
+    let catalogData = []; // Variável para o catálogo
 
-    // URL DA PLANILHA CSV
+    // URL da Planilha de Registros (CSV)
     const REGISTRO_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/pub?gid=195449004&single=true&output=csv';
 
-   // FUNÇÃO DE AUTENTICAÇÃO
-function checkAuth() {
-    const userData = sessionStorage.getItem('vlt_user');
-    if (!userData) {
-        window.location.href = 'index.html';
-        return null;
+    // ==========================================
+    // FUNÇÕES DE AUTENTICAÇÃO E INICIALIZAÇÃO
+    // ==========================================
+    function checkAuth() {
+        const userData = sessionStorage.getItem('vlt_user');
+        if (!userData) {
+            window.location.href = 'index.html';
+            return null;
+        }
+        return JSON.parse(userData);
     }
-    const user = JSON.parse(userData);
-    return user;
-}
 
-    // INICIALIZAÇÃO
     document.addEventListener('DOMContentLoaded', function() {
         console.log("🚀 Inicializando Dashboard SIGMA-MRO...");
         currentUser = checkAuth();
+        
         if (currentUser) {
             console.log("✅ Usuário autenticado:", currentUser.usuario);
             const usuario = currentUser.usuario;
             document.getElementById('userName').textContent = usuario;
             document.getElementById('userRole').textContent = currentUser.tipo;
+            
             const initials = usuario.split('.').map(n => n[0].toUpperCase()).join('');
             document.getElementById('userInitials').textContent = initials;
+            
             if (currentUser.tipo !== 'ADMIN') {
-                document.getElementById('usuarios-menu').style.display = 'none';
+                const adminMenu = document.getElementById('usuarios-menu');
+                if (adminMenu) adminMenu.style.display = 'none';
             }
             loadUserProfile(usuario);
         }
+        
         updateOperationClock();
         setInterval(updateOperationClock, 1000);
         updateMotivationalQuote();
         setInterval(updateMotivationalQuote, 30000);
+        
+        // INICIALIZAÇÃO DO CATÁLOGO (Chamada JSONP)
+        loadCatalogScript();
+
         console.log("✅ Dashboard inicializado com sucesso!");
     });
 
-    // FUNÇÃO PARA CARREGAR PERFIL DO USUÁRIO
-function loadUserProfile(usuario) {
-    const USUARIOS_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/pub?gid=1605075317&single=true&output=csv';
-    document.getElementById('userName').textContent = usuario;
-    document.getElementById('userRole').textContent = currentUser.tipo;
-    const initials = usuario.split('.').map(n => n[0].toUpperCase()).join('');
-    document.getElementById('userInitials').textContent = initials;
+    // Função para carregar o script do Catálogo (JSONP)
+    function loadCatalogScript() {
+        var script = document.createElement('script');
+        script.src = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/tq?tqx=out:json&callback=loadCatalogData&gid=281666011';
+        document.body.appendChild(script);
+    }
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
+    // ==========================================
+    // FUNÇÕES DO PERFIL
+    // ==========================================
+    function loadUserProfile(usuario) {
+        const USUARIOS_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/pub?gid=1605075317&single=true&output=csv';
+        
+        fetch(USUARIOS_CSV)
+            .then(r => r.text())
+            .then(csv => {
+                const rows = parseCSV(csv);
+                const userRow = rows.find(r => r.Usuário === usuario || r.Usuario === usuario);
+                if (userRow) {
+                    document.getElementById('perfil-nome').textContent = userRow.Nome_Completo || '-';
+                    document.getElementById('perfil-usuario').textContent = usuario;
+                    document.getElementById('perfil-email').textContent = userRow.Email || '-';
+                    const telefone = userRow.Telefone || '';
+                    document.getElementById('perfil-telefone').innerHTML = telefone ? `<a href="https://wa.me/55${telefone.replace(/\D/g, '')}" target="_blank" class="modal-link">Conversar no WhatsApp</a>` : 'Não informado';
+                    document.getElementById('perfil-endereco').textContent = userRow.Endereco || '-';
+                    document.getElementById('perfil-matrícula').textContent = userRow.Matrícula || '-';
+                    document.getElementById('perfil-tipo').textContent = userRow.Tipo || currentUser.tipo;
+                }
+            })
+            .catch(e => console.error('Erro ao carregar perfil:', e));
+    }
 
-    fetch(USUARIOS_CSV, { signal: controller.signal })
-        .then(r => r.text())
-        .then(csv => {
-            clearTimeout(timeoutId);
-            const rows = parseCSV(csv);
-            const userRow = rows.find(r => r.Usuário === usuario || r.Usuario === usuario);
-            if (userRow) {
-                document.getElementById('perfil-nome').textContent = userRow.Nome_Completo || '-';
-                document.getElementById('perfil-usuario').textContent = usuario;
-                document.getElementById('perfil-email').textContent = userRow.Email || '-';
-                const telefone = userRow.Telefone || '';
-                document.getElementById('perfil-telefone').innerHTML = telefone ? `<a href="https://wa.me/55${telefone.replace(/\D/g, '')}" target="_blank" class="modal-link">Conversar no WhatsApp</a>` : 'Não informado';
-                document.getElementById('perfil-endereco').textContent = userRow.Endereco || '-';
-                document.getElementById('perfil-matrícula').textContent = userRow.Matrícula || '-';
-                document.getElementById('perfil-tipo').textContent = userRow.Tipo || currentUser.tipo;
-            }
-        })
-        .catch(e => {
-            clearTimeout(timeoutId);
-            console.error('Erro ao carregar perfil:', e);
-        });
-}
-
-    // FUNÇÃO PRINCIPAL PARA MOSTRAR PÁGINAS
+    // ==========================================
+    // NAVEGAÇÃO E PÁGINAS
+    // ==========================================
     function showPage(pageName, event = null) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         const targetPage = document.getElementById('page-' + pageName);
@@ -1542,16 +1553,18 @@ function loadUserProfile(usuario) {
         };
         document.getElementById('breadcrumb').textContent = titles[pageName] || pageName;
         
-        if (pageName === 'passagem') {
-            document.getElementById('passagem-filters').style.display = 'flex';
-        } else {
-            document.getElementById('passagem-filters').style.display = 'none';
+        const passagemFilters = document.getElementById('passagem-filters');
+        if (passagemFilters) {
+            passagemFilters.style.display = (pageName === 'passagem') ? 'flex' : 'none';
         }
+
         if (pageName === 'usuarios') loadUsuarios();
         if (pageName === 'documentacao') loadDocumentacao();
     }
 
-    // --- FUNÇÕES DE PASSAGEM DE SERVIÇO ---
+    // ==========================================
+    // FUNÇÕES DE PASSAGEM DE SERVIÇO
+    // ==========================================
     function openPassagemFilterModal() { document.getElementById('passagemFilterModal').classList.add('show'); }
     function closePassagemFilterModal() { document.getElementById('passagemFilterModal').classList.remove('show'); }
 
@@ -1569,7 +1582,6 @@ function loadUserProfile(usuario) {
     function processPassagemFilters() {
         const grupo = document.getElementById('passagemGrupo').value;
         const status = document.getElementById('passagemStatus').value;
-        // Adicione outros filtros se necessário
         
         filteredPassagemData = allRegistros.filter(r => {
             if (grupo && r['GRUPO'] !== grupo) return false;
@@ -1605,15 +1617,109 @@ function loadUserProfile(usuario) {
         document.getElementById('passagem-table').innerHTML = '<tr><td colspan="7">Clique em "Aplicar Filtros"</td></tr>';
     }
 
-    // --- FUNÇÕES GERAIS ---
+    // ==========================================
+    // CÓDIGO DO CATÁLOGO (MÉTODO JSONP)
+    // ==========================================
+    
+    // Esta função é chamada automaticamente pelo Google Sheets
+    function loadCatalogData(json) {
+        catalogData = [];
+        if (json && json.table && json.table.rows) {
+            json.table.rows.forEach(row => {
+                // Lê as colunas: A=0 (Código), B=1 (Nome), C=2 (Link)
+                if (row.c && row.c[0] && row.c[0].v !== undefined && row.c[0].v !== null) {
+                    
+                    let codigo = row.c[0].v;
+                    let nome = row.c[1] && row.c[1].v ? row.c[1].v : '-';
+                    let link = row.c[2] && row.c[2].v ? row.c[2].v : '';
+
+                    // Converte código numérico para texto
+                    if (typeof codigo === 'number') {
+                        codigo = codigo.toString();
+                    }
+
+                    catalogData.push({ codigo, nome, link });
+                }
+            });
+        }
+        console.log("Catálogo carregado:", catalogData.length, "itens");
+        renderCatalogTable(catalogData);
+    }
+
+    function renderCatalogTable(data) {
+        const tbody = document.getElementById('catalogTableBody');
+        if (!tbody) return; // Segurança caso o HTML não tenha o elemento
+        tbody.innerHTML = '';
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum material encontrado.</td></tr>';
+            return;
+        }
+
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            const itemJson = JSON.stringify(item).replace(/'/g, "\\'");
+            
+            tr.innerHTML = `
+                <td>${item.codigo}</td>
+                <td>${item.nome}</td>
+                <td><button class="btn-catalog-action" onclick='openCatalogModal(${itemJson})'>Ver Detalhes</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function filterCatalog() {
+        const term = document.getElementById('catalogSearchInput').value.toLowerCase().trim();
+        
+        if (!term) {
+            renderCatalogTable(catalogData);
+            return;
+        }
+
+        const filtered = catalogData.filter(item => {
+            const codStr = String(item.codigo).toLowerCase();
+            const nomStr = String(item.nome).toLowerCase();
+            return codStr.includes(term) || nomStr.includes(term);
+        });
+
+        renderCatalogTable(filtered);
+    }
+
+    function openCatalogModal(item) {
+        document.getElementById('catalogModalTitle').innerText = item.nome;
+        document.getElementById('catalogModalCode').innerText = item.codigo;
+        
+        const imgDiv = document.getElementById('catalogModalImageDiv');
+        
+        if (item.link && item.link !== 'null' && item.link.trim() !== '') {
+            imgDiv.innerHTML = `<img src="${item.link}" class="catalog-modal-image" onerror="this.outerHTML='<p style=color:red>Erro ao carregar imagem</p>'">`;
+        } else {
+            imgDiv.innerHTML = '<p style="color:#888; margin-top:20px;">Sem imagem cadastrada.</p>';
+        }
+        
+        document.getElementById('catalogModal').style.display = 'block';
+    }
+
+    function closeCatalogModal() {
+        document.getElementById('catalogModal').style.display = 'none';
+    }
+
+    // ==========================================
+    // FUNÇÕES AUXILIARES GERAIS
+    // ==========================================
     function takeScreenshot() {
         const element = document.querySelector('.page.active');
-        html2canvas(element, { scale: 2 }).then(canvas => {
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
-            link.download = 'VLT_Screenshot.png';
-            link.click();
-        });
+        if (typeof html2canvas !== 'undefined') {
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'VLT_Screenshot.png';
+                link.click();
+            });
+        } else {
+            console.error("html2canvas não está carregado.");
+        }
     }
     
     function openProfileModal() { document.getElementById('profileModal').classList.add('show'); }
@@ -1637,7 +1743,9 @@ function loadUserProfile(usuario) {
         document.getElementById('op-seconds').textContent = Math.floor((diff % (1000 * 60)) / 1000);
     }
 
-    // --- PARSING CSV (IGNORA FORMATAÇÃO) ---
+    // ==========================================
+    // PARSING CSV
+    // ==========================================
     function parseCSV(csvText) {
         const lines = csvText.split('\n');
         const headers = parseCSVLine(lines[0]);
@@ -1673,7 +1781,6 @@ function loadUserProfile(usuario) {
         return result;
     }
 
-    // --- OUTRAS FUNÇÕES AUXILIARES ---
     function loadUsuarios() {
         fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/pub?gid=1605075317&single=true&output=csv')
             .then(r => r.text())
@@ -1705,122 +1812,15 @@ function loadUserProfile(usuario) {
         `).join('');
     }
 
-    // --- CÓDIGO DO CATÁLOGO (CORRIGIDO PARA LER COLUNAS A E B) ---
-    
-    // Variável para armazenar os dados do catálogo
-    let catalogData = [];
-
-    // Função que processa os dados vindos do Google Sheets
-    function loadCatalogData(json) {
-        catalogData = [];
-        // O Google Sheets retorna os dados em 'rows'
-        const rows = json.table.rows;
-
-        rows.forEach(row => {
-            // Pegando os dados das colunas pela posição (c[0] = Coluna A, c[1] = Coluna B, c[2] = Coluna C)
-            // Verifica se a linha existe e tem dados na primeira coluna
-            if (row.c && row.c[0] && row.c[0].v !== undefined && row.c[0].v !== null) {
-                
-                // Pega o valor bruto (v)
-                let codigo = row.c[0].v; 
-                let nome = row.c[1] && row.c[1].v ? row.c[1].v : '-';
-                let link = row.c[2] && row.c[2].v ? row.c[2].v : '';
-
-                // Tratamento especial: se o código for numérico (ex: 5017158), converte para string
-                if (typeof codigo === 'number') {
-                    codigo = codigo.toString();
-                }
-
-                catalogData.push({
-                    codigo: codigo,
-                    nome: nome,
-                    link: link
-                });
-            }
-        });
-
-        console.log("Catálogo carregado:", catalogData.length, "itens");
-        renderCatalogTable(catalogData);
-    }
-
-    // Função para desenhar a tabela
-    function renderCatalogTable(data) {
-        const tbody = document.getElementById('catalogTableBody');
-        tbody.innerHTML = '';
-
-        if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum material encontrado.</td></tr>';
-            return;
-        }
-
-        data.forEach(item => {
-            const tr = document.createElement('tr');
-            const itemJson = JSON.stringify(item).replace(/'/g, "\\'");
-            
-            tr.innerHTML = `
-                <td>${item.codigo}</td>
-                <td>${item.nome}</td>
-                <td><button class="btn-catalog-action" onclick='openCatalogModal(${itemJson})'>Ver Detalhes</button></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    // Função de Pesquisa (Filtra por Código OU Nome)
-    function filterCatalog() {
-        const term = document.getElementById('catalogSearchInput').value.toLowerCase().trim();
-        
-        if (!term) {
-            renderCatalogTable(catalogData);
-            return;
-        }
-
-        const filtered = catalogData.filter(item => {
-            const codStr = String(item.codigo).toLowerCase();
-            const nomStr = String(item.nome).toLowerCase();
-            // Retorna verdadeiro se achar o termo no código OU no nome
-            return codStr.includes(term) || nomStr.includes(term);
-        });
-
-        renderCatalogTable(filtered);
-    }
-
-    // Funções do Modal
-    function openCatalogModal(item) {
-        document.getElementById('catalogModalTitle').innerText = item.nome;
-        document.getElementById('catalogModalCode').innerText = item.codigo;
-        
-        const imgDiv = document.getElementById('catalogModalImageDiv');
-        
-        if (item.link && item.link !== 'null' && item.link.trim() !== '') {
-            imgDiv.innerHTML = `<img src="${item.link}" class="catalog-modal-image" onerror="this.outerHTML='<p style=color:red>Erro ao carregar imagem</p>'">`;
-        } else {
-            imgDiv.innerHTML = '<p style="color:#888; margin-top:20px;">Sem imagem cadastrada.</p>';
-        }
-        
-        document.getElementById('catalogModal').style.display = 'block';
-    }
-
-    function closeCatalogModal() {
-        document.getElementById('catalogModal').style.display = 'none';
-    }
-
-    // Carrega os dados reais do Google Sheets ao abrir a página
-    window.onload = function() {
-        var script = document.createElement('script');
-        script.src = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/tq?tqx=out:json&callback=loadCatalogData&gid=281666011';
-        document.body.appendChild(script);
-    };
-
-    // Fechar modal clicando fora
+    // Fechar modal do catálogo clicando fora
     window.onclick = function(event) {
         const modal = document.getElementById('catalogModal');
         if (event.target == modal) {
             closeCatalogModal();
         }
     }
+</script>
 
-    </script>
     function downloadDocument(filePath, fileName) {
         const link = document.createElement('a');
         link.href = filePath;
