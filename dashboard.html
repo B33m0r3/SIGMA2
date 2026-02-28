@@ -1539,31 +1539,44 @@
 <div class="page" id="page-catalogo">
     <div class="page-header">
         <h1>📚 Catálogo de Materiais</h1>
-        <p>Lista atualizada automaticamente via Google Sheets.</p>
+        <p>Digite o código SAP ou nome do equipamento para pesquisar.</p>
     </div>
 
-    <!-- Container da Tabela -->
-    <div class="catalog-container">
+    <!-- BARRA DE PESQUISA -->
+    <div class="search-container" style="margin: 20px 0;">
+        <input type="text" id="catalogSearchInput" placeholder="Pesquisar (Código ou Nome)..." onkeyup="filterCatalog()" style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+    </div>
+
+    <!-- TABELA DE RESULTADOS -->
+    <div class="catalog-container" style="overflow-x: auto;">
         <table class="catalog-table" id="catalogTable">
             <thead>
                 <tr>
                     <th>Código SAP</th>
                     <th>Nome do Material</th>
-                    <th>Imagem</th>
+                    <th>Ação</th>
                 </tr>
             </thead>
             <tbody id="catalogBody">
-                <!-- As linhas da planilha aparecerão aqui automaticamente -->
+                <!-- Os resultados da pesquisa aparecerão aqui -->
+                <tr><td colspan="3" style="text-align:center;">Carregando dados da planilha...</td></tr>
             </tbody>
         </table>
     </div>
 
-    <!-- Modal para visualizar a imagem (estilo Sigma Help) -->
-    <div id="imageModal" class="catalog-modal">
-        <div class="modal-content-box">
-            <span class="modal-close-btn" onclick="closeCatalogModal()">&times;</span>
-            <h3 id="modalTitle">Imagem do Material</h3>
-            <img src="" alt="Imagem do Material" class="modal-image" id="modalImage">
+    <!-- MODAL (Janela de Diálogo para mostrar a Imagem) -->
+    <div id="catalogModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7);">
+        <div class="modal-content" style="background-color: #fff; margin: 5% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 600px; position: relative;">
+            <span onclick="closeCatalogModal()" style="position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; font-weight: bold;">&times;</span>
+            
+            <div style="text-align: center;">
+                <h2 id="modalTitle" style="margin-bottom: 5px;"></h2>
+                <h4 id="modalCode" style="color: #666; margin-top: 0;"></h4>
+                <hr>
+                <div id="modalImageContainer">
+                    <!-- A imagem aparecerá aqui -->
+                </div>
+            </div>
         </div>
     </div>
 </div>
