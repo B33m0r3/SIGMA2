@@ -247,6 +247,7 @@
         .tab-btn.active { background: white; border-bottom-color: var(--primary); color: var(--primary); }
         .tab-content { display: none; padding: 20px; background: white; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
         .tab-content.active { display: block; }
+
         /* ============================================================
            ESTILOS CATÁLOGO
            ============================================================ */
@@ -285,17 +286,18 @@
         .loading-spinner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; color: var(--primary); font-size: 18px; }
         .loading-spinner i { font-size: 30px; margin-bottom: 15px; }
         .highlight { background-color: #fff59d; padding: 0 2px; border-radius: 2px; }
+
         /* ============================================================
            ESTILOS LABORATÓRIO
            ============================================================ */
         .laboratorio-container { display: flex; gap: 20px; flex-wrap: wrap; }
         .laboratorio-col { flex: 1; min-width: 300px; }
         .laboratorio-col h3 { font-size: 18px; color: var(--dark); margin-bottom: 15px; text-align: center; background: var(--light); padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
+
         /* ============================================================
-           *** NOVOS ESTILOS — ABA PREVENTIVA ***
+           *** ESTILOS — ABA PREVENTIVA ***
            ============================================================ */
 
-        /* Hub principal (grade de botões) */
         .preventiva-hub-wrapper {
             display: flex;
             flex-direction: column;
@@ -312,7 +314,6 @@
             margin-top: 10px;
         }
 
-        /* Card de cada botão/opção */
         .preventiva-hub-card {
             background: rgba(255, 255, 255, 0.97);
             backdrop-filter: blur(12px);
@@ -332,7 +333,6 @@
             overflow: hidden;
         }
 
-        /* Barra colorida no topo que aparece no hover */
         .preventiva-hub-card::before {
             content: '';
             position: absolute;
@@ -353,7 +353,6 @@
             border-color: var(--primary);
         }
 
-        /* Círculo com ícone */
         .preventiva-hub-card .hub-icon-circle {
             width: 80px;
             height: 80px;
@@ -381,10 +380,9 @@
         .preventiva-hub-card:hover .hub-icon-circle i {
             background: white;
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-text-fill-color: white;
             background-clip: text;
             filter: brightness(0) invert(1);
-            -webkit-text-fill-color: white;
         }
 
         .preventiva-hub-card .hub-card-label {
@@ -401,7 +399,6 @@
             max-width: 180px;
         }
 
-        /* Badge de "Em breve" para futuros botões */
         .hub-badge-soon {
             position: absolute;
             top: 14px;
@@ -415,7 +412,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Botão de voltar ao hub */
+        /* Botão de voltar */
         .preventiva-back-btn {
             display: inline-flex;
             align-items: center;
@@ -441,7 +438,7 @@
             box-shadow: 0 4px 12px rgba(102,126,234,0.3);
         }
 
-        /* Banner de título da seção dentro de preventiva */
+        /* Banner de título da seção */
         .preventiva-section-banner {
             background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.08));
             border: 1px solid rgba(102,126,234,0.2);
@@ -470,10 +467,132 @@
             margin-top: 2px;
         }
 
+        /* ── Sub-hub de Pendências ── */
+        .pendencias-sub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 22px;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 10px;
+        }
+
+        /* Cards do sub-hub de Pendências com cores distintas */
+        .pendencias-sub-card {
+            background: rgba(255,255,255,0.97);
+            border-radius: 16px;
+            padding: 36px 22px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+            border: 2px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pendencias-sub-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--card-accent, linear-gradient(135deg, var(--primary), var(--secondary)));
+            border-radius: 16px 16px 0 0;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .pendencias-sub-card:hover::before { transform: scaleX(1); }
+
+        .pendencias-sub-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+            border-color: transparent;
+        }
+
+        /* Card Nova Pendência — verde */
+        .pcard-nova { --card-accent: linear-gradient(135deg, #11998e, #38ef7d); }
+        .pcard-nova:hover { box-shadow: 0 16px 40px rgba(17,153,142,0.25); }
+        .pcard-nova .psub-icon { background: linear-gradient(135deg, rgba(17,153,142,0.12), rgba(56,239,125,0.15)); }
+        .pcard-nova:hover .psub-icon { background: linear-gradient(135deg, #11998e, #38ef7d); }
+        .pcard-nova .psub-icon i { background: linear-gradient(135deg, #11998e, #38ef7d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .pcard-nova:hover .psub-icon i { -webkit-text-fill-color: white; filter: brightness(0) invert(1); }
+
+        /* Card Tratativa — azul */
+        .pcard-tratativa { --card-accent: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .pcard-tratativa:hover { box-shadow: 0 16px 40px rgba(79,172,254,0.25); }
+        .pcard-tratativa .psub-icon { background: linear-gradient(135deg, rgba(79,172,254,0.12), rgba(0,242,254,0.15)); }
+        .pcard-tratativa:hover .psub-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .pcard-tratativa .psub-icon i { background: linear-gradient(135deg, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .pcard-tratativa:hover .psub-icon i { -webkit-text-fill-color: white; filter: brightness(0) invert(1); }
+
+        /* Card Dados — laranja */
+        .pcard-dados { --card-accent: linear-gradient(135deg, #f7971e, #ffd200); }
+        .pcard-dados:hover { box-shadow: 0 16px 40px rgba(247,151,30,0.25); }
+        .pcard-dados .psub-icon { background: linear-gradient(135deg, rgba(247,151,30,0.12), rgba(255,210,0,0.15)); }
+        .pcard-dados:hover .psub-icon { background: linear-gradient(135deg, #f7971e, #ffd200); }
+        .pcard-dados .psub-icon i { background: linear-gradient(135deg, #f7971e, #ffd200); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .pcard-dados:hover .psub-icon i { -webkit-text-fill-color: white; filter: brightness(0) invert(1); }
+
+        /* Card Planilha Pendências — roxo */
+        .pcard-plan-pend { --card-accent: linear-gradient(135deg, #667eea, #764ba2); }
+        .pcard-plan-pend:hover { box-shadow: 0 16px 40px rgba(102,126,234,0.25); }
+        .pcard-plan-pend .psub-icon { background: linear-gradient(135deg, rgba(102,126,234,0.12), rgba(118,75,162,0.15)); }
+        .pcard-plan-pend:hover .psub-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .pcard-plan-pend .psub-icon i { background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .pcard-plan-pend:hover .psub-icon i { -webkit-text-fill-color: white; filter: brightness(0) invert(1); }
+
+        /* Card Planilha Tratativas — vermelho-rosado */
+        .pcard-plan-trat { --card-accent: linear-gradient(135deg, #f5576c, #f093fb); }
+        .pcard-plan-trat:hover { box-shadow: 0 16px 40px rgba(245,87,108,0.25); }
+        .pcard-plan-trat .psub-icon { background: linear-gradient(135deg, rgba(245,87,108,0.12), rgba(240,147,251,0.15)); }
+        .pcard-plan-trat:hover .psub-icon { background: linear-gradient(135deg, #f5576c, #f093fb); }
+        .pcard-plan-trat .psub-icon i { background: linear-gradient(135deg, #f5576c, #f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .pcard-plan-trat:hover .psub-icon i { -webkit-text-fill-color: white; filter: brightness(0) invert(1); }
+
+        .psub-icon {
+            width: 70px; height: 70px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .psub-icon i { font-size: 32px; transition: all 0.3s ease; }
+
+        .psub-label {
+            font-size: 16px; font-weight: 700; color: var(--dark); letter-spacing: 0.3px;
+        }
+
+        .psub-desc {
+            font-size: 11px; color: #8a99aa; line-height: 1.4; max-width: 160px;
+        }
+
+        /* Breadcrumb interno da Preventiva */
+        .prev-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #8a99aa;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .prev-breadcrumb span { cursor: pointer; transition: color 0.2s; }
+        .prev-breadcrumb span:hover { color: var(--primary); text-decoration: underline; }
+        .prev-breadcrumb .sep { color: #bbb; }
+        .prev-breadcrumb .current { color: var(--dark); font-weight: 600; cursor: default; }
+        .prev-breadcrumb .current:hover { text-decoration: none; color: var(--dark); }
+
         /* Responsividade */
         @media (max-width: 768px) {
             .preventiva-hub-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
             .preventiva-hub-card { padding: 30px 16px 26px; }
+            .pendencias-sub-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
             .top-bar { padding: 12px 15px; }
             .screenshot-btn { padding: 6px 12px; font-size: 12px; }
             .user-info { display: none; }
@@ -489,6 +608,7 @@
 
         @media (max-width: 480px) {
             .preventiva-hub-grid { grid-template-columns: 1fr; }
+            .pendencias-sub-grid { grid-template-columns: 1fr; }
         }
 
         .fallback-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; color: var(--dark); }
@@ -532,14 +652,10 @@
                     <i class="fas fa-flask"></i>
                     <span class="nav-label">Laboratório</span>
                 </li>
-                <!-- =====================================================
-                     NOVO ITEM DE MENU — PREVENTIVA
-                     ===================================================== -->
                 <li class="nav-item" onclick="showPage('preventiva', event)">
                     <i class="fas fa-shield-alt"></i>
                     <span class="nav-label">Preventiva</span>
                 </li>
-                <!-- ===================================================== -->
                 <li class="nav-item" onclick="showPage('eva', event)">
                     <i class="fas fa-robot"></i>
                     <span class="nav-label">EVA</span>
@@ -566,10 +682,7 @@
                         <span class="nav-label">SIGMA-HELP</span>
                     </a>
                 </li>
-                <li class="nav-item" onclick="showPage('programacao', event)">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span class="nav-label">Programação</span>
-                </li>
+                <!-- ✅ Programação REMOVIDA do menu lateral — agora está dentro de Preventiva -->
                 <li class="nav-item" onclick="showPage('plano_frota', event)">
                     <i class="fas fa-train"></i>
                     <span class="nav-label">Plano de Frota</span>
@@ -609,9 +722,7 @@
             <div class="content">
                 <div class="pages-wrapper">
 
-                    <!-- ================================================
-                         PLANO DE FROTA
-                         ================================================ -->
+                    <!-- PLANO DE FROTA -->
                     <div class="page" id="page-plano_frota">
                         <div class="page-header">
                             <h1>🚆 Plano de Frota</h1>
@@ -631,9 +742,7 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         AVISOS
-                         ================================================ -->
+                    <!-- AVISOS -->
                     <div class="page" id="page-avisos">
                         <div class="page-header">
                             <h1>📢 Avisos</h1>
@@ -653,9 +762,7 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         DASHBOARD
-                         ================================================ -->
+                    <!-- DASHBOARD -->
                     <div class="page active" id="page-dashboard">
                         <div class="cards-container" id="dashboard-cards"></div>
                         <div style="width: 100%; height: 600px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; position: relative;">
@@ -664,9 +771,7 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         PLANTÃO
-                         ================================================ -->
+                    <!-- PLANTÃO -->
                     <div class="page" id="page-plantao">
                         <div class="page-header">
                             <h1>🕒 Plantão</h1>
@@ -704,9 +809,7 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         PASSAGEM DE SERVIÇO
-                         ================================================ -->
+                    <!-- PASSAGEM DE SERVIÇO -->
                     <div class="page" id="page-passagem">
                         <div class="page-header">
                             <h1>📋 Passagem de Serviço</h1>
@@ -745,9 +848,7 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         NOVO REGISTRO
-                         ================================================ -->
+                    <!-- NOVO REGISTRO -->
                     <div class="page" id="page-novo_registro">
                         <div class="page-header">
                             <h1>➕ Novo Registro</h1>
@@ -763,9 +864,7 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         USUÁRIOS
-                         ================================================ -->
+                    <!-- USUÁRIOS -->
                     <div class="page" id="page-usuarios">
                         <div class="page-header">
                             <h1>👥 Usuários do Sistema</h1>
@@ -783,9 +882,7 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         LABORATÓRIO
-                         ================================================ -->
+                    <!-- LABORATÓRIO -->
                     <div class="page" id="page-laboratorio">
                         <div class="page-header">
                             <h1>🔬 Laboratório</h1>
@@ -814,58 +911,62 @@
                     </div>
 
                     <!-- ====================================================
-                         *** NOVA ABA — PREVENTIVA ***
+                         *** ABA PREVENTIVA — NAVEGAÇÃO EM NÍVEIS ***
                          ==================================================== -->
                     <div class="page" id="page-preventiva">
 
-                        <!-- ── HUB (menu de botões, visível por padrão) ── -->
+                        <!-- ══════════════════════════════════════════════
+                             NÍVEL 0 — HUB PRINCIPAL (Pendências / Programação / Relatórios)
+                             ══════════════════════════════════════════════ -->
                         <div id="preventiva-hub-view">
                             <div class="page-header">
                                 <h1>🛡️ Preventiva</h1>
                                 <p>Selecione uma área para acessar as funcionalidades da equipe de Preventiva.</p>
                             </div>
-
                             <div class="preventiva-hub-wrapper">
                                 <div class="preventiva-hub-grid">
 
-                                    <!-- ── Botão: Pendências ── -->
+                                    <!-- Pendências -->
                                     <div class="preventiva-hub-card" onclick="showPreventivaSection('pendencias')">
-                                        <div class="hub-icon-circle">
-                                            <i class="fas fa-clipboard-list"></i>
-                                        </div>
+                                        <div class="hub-icon-circle"><i class="fas fa-clipboard-list"></i></div>
                                         <span class="hub-card-label">Pendências</span>
                                         <span class="hub-card-desc">Registre e acompanhe as pendências da equipe preventiva</span>
                                     </div>
 
-                                    <!-- ── Futuros botões (exemplos desativados) ── -->
-                                    <div class="preventiva-hub-card" style="opacity: 0.45; cursor: not-allowed;" onclick="void(0)">
-                                        <span class="hub-badge-soon">Em breve</span>
-                                        <div class="hub-icon-circle">
-                                            <i class="fas fa-calendar-check"></i>
-                                        </div>
+                                    <!-- ✅ Programação — agora FUNCIONAL -->
+                                    <div class="preventiva-hub-card" onclick="showPreventivaSection('programacao')">
+                                        <div class="hub-icon-circle"><i class="fas fa-calendar-check"></i></div>
                                         <span class="hub-card-label">Programação</span>
-                                        <span class="hub-card-desc">Planejamento de atividades preventivas</span>
+                                        <span class="hub-card-desc">Planejamento e visualização de atividades preventivas</span>
                                     </div>
 
+                                    <!-- Relatórios — em breve -->
                                     <div class="preventiva-hub-card" style="opacity: 0.45; cursor: not-allowed;" onclick="void(0)">
                                         <span class="hub-badge-soon">Em breve</span>
-                                        <div class="hub-icon-circle">
-                                            <i class="fas fa-chart-bar"></i>
-                                        </div>
+                                        <div class="hub-icon-circle"><i class="fas fa-chart-bar"></i></div>
                                         <span class="hub-card-label">Relatórios</span>
                                         <span class="hub-card-desc">Indicadores e relatórios de manutenção preventiva</span>
                                     </div>
 
                                 </div>
-
                                 <p style="margin-top: 30px; font-size: 13px; color: rgba(44,62,80,0.45); font-style: italic;">
                                     <i class="fas fa-info-circle"></i>&nbsp; Novas funcionalidades serão adicionadas em breve.
                                 </p>
                             </div>
                         </div>
 
-                        <!-- ── SEÇÃO: Pendências (oculta por padrão) ── -->
+                        <!-- ══════════════════════════════════════════════
+                             NÍVEL 1-A — SEÇÃO PENDÊNCIAS (sub-hub)
+                             ══════════════════════════════════════════════ -->
                         <div id="preventiva-section-pendencias" style="display: none;">
+
+                            <!-- Breadcrumb interno -->
+                            <div class="prev-breadcrumb">
+                                <span onclick="showPreventivaHub()"><i class="fas fa-shield-alt"></i> Preventiva</span>
+                                <span class="sep">›</span>
+                                <span class="current">Pendências</span>
+                            </div>
+
                             <button class="preventiva-back-btn" onclick="showPreventivaHub()">
                                 <i class="fas fa-arrow-left"></i> Voltar ao Menu
                             </button>
@@ -874,7 +975,61 @@
                                 <i class="fas fa-clipboard-list"></i>
                                 <div>
                                     <h2>Pendências</h2>
-                                    <p>Registros e pendências da equipe de Manutenção Preventiva</p>
+                                    <p>Escolha a ação que deseja realizar</p>
+                                </div>
+                            </div>
+
+                            <!-- Sub-hub de Pendências: 3 cards -->
+                            <div class="preventiva-hub-wrapper" style="padding-top: 0;">
+                                <div class="pendencias-sub-grid">
+
+                                    <!-- Nova Pendência -->
+                                    <div class="pendencias-sub-card pcard-nova" onclick="showPendenciasSection('nova')">
+                                        <div class="psub-icon"><i class="fas fa-plus-circle"></i></div>
+                                        <span class="psub-label">Nova Pendência</span>
+                                        <span class="psub-desc">Registrar uma nova pendência no sistema</span>
+                                    </div>
+
+                                    <!-- Tratativa -->
+                                    <div class="pendencias-sub-card pcard-tratativa" onclick="showPendenciasSection('tratativa')">
+                                        <div class="psub-icon"><i class="fas fa-tools"></i></div>
+                                        <span class="psub-label">Registrar Tratativa</span>
+                                        <span class="psub-desc">Registrar uma tratativa de pendência existente</span>
+                                    </div>
+
+                                    <!-- Acessar Dados -->
+                                    <div class="pendencias-sub-card pcard-dados" onclick="showPendenciasSection('dados')">
+                                        <div class="psub-icon"><i class="fas fa-database"></i></div>
+                                        <span class="psub-label">Acessar Dados</span>
+                                        <span class="psub-desc">Consultar planilhas de pendências e tratativas</span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ══════════════════════════════════════════════
+                             NÍVEL 2-A — FORMULÁRIO NOVA PENDÊNCIA
+                             ══════════════════════════════════════════════ -->
+                        <div id="preventiva-section-pendencias-nova" style="display: none;">
+
+                            <div class="prev-breadcrumb">
+                                <span onclick="showPreventivaHub()"><i class="fas fa-shield-alt"></i> Preventiva</span>
+                                <span class="sep">›</span>
+                                <span onclick="showPreventivaSection('pendencias')">Pendências</span>
+                                <span class="sep">›</span>
+                                <span class="current">Nova Pendência</span>
+                            </div>
+
+                            <button class="preventiva-back-btn" onclick="showPreventivaSection('pendencias')">
+                                <i class="fas fa-arrow-left"></i> Voltar às Pendências
+                            </button>
+
+                            <div class="preventiva-section-banner">
+                                <i class="fas fa-plus-circle" style="color: #11998e;"></i>
+                                <div>
+                                    <h2>Nova Pendência</h2>
+                                    <p>Registre uma nova pendência da equipe de Manutenção Preventiva</p>
                                 </div>
                             </div>
 
@@ -884,62 +1039,210 @@
                                 </button>
                             </div>
 
-                            <!-- Layout igual ao do Laboratório: duas colunas -->
-                            <div class="laboratorio-container">
-
-                                <!-- Coluna esquerda: formulário de registro -->
-                                <div class="laboratorio-col">
-                                    <h3>📝 Registro de Pendências</h3>
-                                    <div class="form-container">
-                                        <div class="loading-overlay" id="loading-preventiva-left"><div class="spinner"></div></div>
-                                        <!--
-                                            ⚠️ FORMULÁRIO DE PENDÊNCIAS DA PREVENTIVA 
-                                            LINK IFRAME - JURACI22
-                                        -->
-                                        <iframe
-                                            src="https://docs.google.com/forms/d/e/1FAIpQLSfGGyp9sc2d9WFokcLn-GdwfN_czJnSozxB9c020Xu8yGe2zQ/viewform?embedded=true"
-                                            class="form-iframe"
-                                            allow="clipboard-read; clipboard-write"
-                                            allowfullscreen
-                                            loading="lazy"
-                                            onload="handleIframeLoad('loading-preventiva-left')"
-                                            onerror="handleIframeError('preventiva', 'https://docs.google.com/forms/d/e/1FAIpQLSfGGyp9sc2d9WFokcLn-GdwfN_czJnSozxB9c020Xu8yGe2zQ/viewform?embedded=true')"
-                                        ></iframe>
-                                    </div>
-                                </div>
-
-                                <!-- Coluna direita: formulário de TRATATIVAS -->
-                                <div class="laboratorio-col">
-                                    <h3>📊 Tratativas</h3>
-                                    <div class="form-container">
-                                        <div class="loading-overlay" id="loading-preventiva-right"><div class="spinner"></div></div>
-                                        <!--
-                                            ⚠️ SUBSTITUA A URL ABAIXO PELO LINK DO SEU SEGUNDO FORMULÁRIO
-                                        -->
-                                        <iframe
-                                            src="https://docs.google.com/forms/d/e/1FAIpQLScgkSWDjs87y1F0ujZW19PRxf5mvbelZeLQoicq6PKPvkZSrA/viewform?embedded=true"
-                                            class="form-iframe"
-                                            allow="clipboard-read; clipboard-write"
-                                            allowfullscreen
-                                            loading="lazy"
-                                            onload="handleIframeLoad('loading-preventiva-right')"
-                                            onerror="handleIframeError('preventiva', 'https://docs.google.com/forms/d/e/1FAIpQLScgkSWDjs87y1F0ujZW19PRxf5mvbelZeLQoicq6PKPvkZSrA/viewform?embedded=true')"
-                                        ></iframe>
-                                    </div>
-                                </div>
-
+                            <div class="form-container">
+                                <div class="loading-overlay" id="loading-preventiva-nova"><div class="spinner"></div></div>
+                                <iframe
+                                    src="https://docs.google.com/forms/d/e/1FAIpQLSfGGyp9sc2d9WFokcLn-GdwfN_czJnSozxB9c020Xu8yGe2zQ/viewform?embedded=true"
+                                    class="form-iframe"
+                                    allow="clipboard-read; clipboard-write"
+                                    allowfullscreen
+                                    loading="lazy"
+                                    onload="handleIframeLoad('loading-preventiva-nova')"
+                                    onerror="handleIframeError('preventiva', 'https://docs.google.com/forms/d/e/1FAIpQLSfGGyp9sc2d9WFokcLn-GdwfN_czJnSozxB9c020Xu8yGe2zQ/viewform?embedded=true')"
+                                ></iframe>
                             </div>
                         </div>
-                        <!-- ── Fim das seções de Preventiva ── -->
+
+                        <!-- ══════════════════════════════════════════════
+                             NÍVEL 2-B — FORMULÁRIO TRATATIVA
+                             ══════════════════════════════════════════════ -->
+                        <div id="preventiva-section-pendencias-tratativa" style="display: none;">
+
+                            <div class="prev-breadcrumb">
+                                <span onclick="showPreventivaHub()"><i class="fas fa-shield-alt"></i> Preventiva</span>
+                                <span class="sep">›</span>
+                                <span onclick="showPreventivaSection('pendencias')">Pendências</span>
+                                <span class="sep">›</span>
+                                <span class="current">Registrar Tratativa</span>
+                            </div>
+
+                            <button class="preventiva-back-btn" onclick="showPreventivaSection('pendencias')">
+                                <i class="fas fa-arrow-left"></i> Voltar às Pendências
+                            </button>
+
+                            <div class="preventiva-section-banner">
+                                <i class="fas fa-tools" style="color: #4facfe;"></i>
+                                <div>
+                                    <h2>Registrar Tratativa</h2>
+                                    <p>Registre a tratativa de uma pendência existente</p>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <button class="btn-primary" onclick="takePageScreenshot('preventiva')">
+                                    <i class="fas fa-camera"></i> Capturar Tela
+                                </button>
+                            </div>
+
+                            <div class="form-container">
+                                <div class="loading-overlay" id="loading-preventiva-tratativa"><div class="spinner"></div></div>
+                                <iframe
+                                    src="https://docs.google.com/forms/d/e/1FAIpQLScgkSWDjs87y1F0ujZW19PRxf5mvbelZeLQoicq6PKPvkZSrA/viewform?embedded=true"
+                                    class="form-iframe"
+                                    allow="clipboard-read; clipboard-write"
+                                    allowfullscreen
+                                    loading="lazy"
+                                    onload="handleIframeLoad('loading-preventiva-tratativa')"
+                                    onerror="handleIframeError('preventiva', 'https://docs.google.com/forms/d/e/1FAIpQLScgkSWDjs87y1F0ujZW19PRxf5mvbelZeLQoicq6PKPvkZSrA/viewform?embedded=true')"
+                                ></iframe>
+                            </div>
+                        </div>
+
+                        <!-- ══════════════════════════════════════════════
+                             NÍVEL 2-C — HUB ACESSAR DADOS (2 planilhas)
+                             ══════════════════════════════════════════════ -->
+                        <div id="preventiva-section-pendencias-dados" style="display: none;">
+
+                            <div class="prev-breadcrumb">
+                                <span onclick="showPreventivaHub()"><i class="fas fa-shield-alt"></i> Preventiva</span>
+                                <span class="sep">›</span>
+                                <span onclick="showPreventivaSection('pendencias')">Pendências</span>
+                                <span class="sep">›</span>
+                                <span class="current">Acessar Dados</span>
+                            </div>
+
+                            <button class="preventiva-back-btn" onclick="showPreventivaSection('pendencias')">
+                                <i class="fas fa-arrow-left"></i> Voltar às Pendências
+                            </button>
+
+                            <div class="preventiva-section-banner">
+                                <i class="fas fa-database" style="color: #f7971e;"></i>
+                                <div>
+                                    <h2>Acessar Dados</h2>
+                                    <p>Escolha qual planilha deseja visualizar</p>
+                                </div>
+                            </div>
+
+                            <div class="preventiva-hub-wrapper" style="padding-top: 0;">
+                                <div class="pendencias-sub-grid" style="max-width: 560px;">
+
+                                    <!-- Planilha de Pendências -->
+                                    <div class="pendencias-sub-card pcard-plan-pend"
+                                         onclick="showPendenciasSheetEmbed('pendencias-sheet', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/pubhtml?gid=1218529227&single=true', 'Planilha de Pendências')">
+                                        <div class="psub-icon"><i class="fas fa-table"></i></div>
+                                        <span class="psub-label">Pendências</span>
+                                        <span class="psub-desc">Visualizar a planilha de pendências registradas</span>
+                                    </div>
+
+                                    <!-- Planilha de Tratativas -->
+                                    <div class="pendencias-sub-card pcard-plan-trat"
+                                         onclick="showPendenciasSheetEmbed('tratativas-sheet', 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/pubhtml?gid=1889986680&single=true', 'Planilha de Tratativas')">
+                                        <div class="psub-icon"><i class="fas fa-file-alt"></i></div>
+                                        <span class="psub-label">Tratativas</span>
+                                        <span class="psub-desc">Visualizar a planilha de tratativas registradas</span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ══════════════════════════════════════════════
+                             NÍVEL 2-D — VISUALIZAÇÃO DA PLANILHA (embed)
+                             ══════════════════════════════════════════════ -->
+                        <div id="preventiva-section-sheet-view" style="display: none;">
+
+                            <div class="prev-breadcrumb" id="sheet-breadcrumb">
+                                <span onclick="showPreventivaHub()"><i class="fas fa-shield-alt"></i> Preventiva</span>
+                                <span class="sep">›</span>
+                                <span onclick="showPreventivaSection('pendencias')">Pendências</span>
+                                <span class="sep">›</span>
+                                <span onclick="showPendenciasSection('dados')">Acessar Dados</span>
+                                <span class="sep">›</span>
+                                <span class="current" id="sheet-breadcrumb-name">Planilha</span>
+                            </div>
+
+                            <button class="preventiva-back-btn" onclick="showPendenciasSection('dados')">
+                                <i class="fas fa-arrow-left"></i> Voltar aos Dados
+                            </button>
+
+                            <div class="preventiva-section-banner" id="sheet-banner">
+                                <i class="fas fa-table" style="color: var(--primary);"></i>
+                                <div>
+                                    <h2 id="sheet-title">Planilha</h2>
+                                    <p>Visualização em tempo real</p>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                                <a id="sheet-open-btn" href="#" target="_blank" class="btn-primary">
+                                    <i class="fas fa-external-link-alt"></i> Abrir em Nova Aba
+                                </a>
+                                <button class="btn-primary" onclick="takePageScreenshot('preventiva')">
+                                    <i class="fas fa-camera"></i> Capturar Tela
+                                </button>
+                            </div>
+
+                            <div class="table-container" style="min-height: 650px;">
+                                <div class="loading-overlay" id="loading-sheet-view"><div class="spinner"></div></div>
+                                <iframe
+                                    id="sheet-iframe"
+                                    src=""
+                                    frameborder="0"
+                                    style="border: 0; width: 100%; height: 650px;"
+                                    onload="document.getElementById('loading-sheet-view').classList.add('hidden')"
+                                    allowfullscreen
+                                ></iframe>
+                            </div>
+                        </div>
+
+                        <!-- ══════════════════════════════════════════════
+                             NÍVEL 1-B — SEÇÃO PROGRAMAÇÃO
+                             ══════════════════════════════════════════════ -->
+                        <div id="preventiva-section-programacao" style="display: none;">
+
+                            <div class="prev-breadcrumb">
+                                <span onclick="showPreventivaHub()"><i class="fas fa-shield-alt"></i> Preventiva</span>
+                                <span class="sep">›</span>
+                                <span class="current">Programação</span>
+                            </div>
+
+                            <button class="preventiva-back-btn" onclick="showPreventivaHub()">
+                                <i class="fas fa-arrow-left"></i> Voltar ao Menu
+                            </button>
+
+                            <div class="preventiva-section-banner">
+                                <i class="fas fa-calendar-check" style="color: #667eea;"></i>
+                                <div>
+                                    <h2>Programação</h2>
+                                    <p>Planejamento e visualização de atividades preventivas</p>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 20px;">
+                                <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQh0a-BMomvvOomRWYGlmoZSPG6ZuwF1jRXFrm8yhzMzizB9vWBgFiFBRyFBRRHQfVVoRppT3E8FBKS/pubhtml?gid=1564591852&single=true" target="_blank" class="btn-primary">
+                                    <i class="fas fa-table"></i> Acessar Planilha
+                                </a>
+                                <button class="btn-primary" onclick="takePageScreenshot('preventiva')" style="margin-left: 10px;">
+                                    <i class="fas fa-camera"></i> Capturar Tela
+                                </button>
+                            </div>
+
+                            <div class="table-container" style="min-height: 650px;">
+                                <div class="loading-overlay" id="loading-programacao-prev"><div class="spinner"></div></div>
+                                <iframe
+                                    src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/pubhtml?gid=1888450540&single=true"
+                                    frameborder="0"
+                                    style="border: 0; width: 100%; height: 650px;"
+                                    onload="document.getElementById('loading-programacao-prev').classList.add('hidden')"
+                                    allowfullscreen
+                                ></iframe>
+                            </div>
+                        </div>
 
                     </div>
-                    <!-- ====================================================
-                         FIM DA ABA PREVENTIVA
-                         ==================================================== -->
+                    <!-- FIM DA ABA PREVENTIVA -->
 
-                    <!-- ================================================
-                         EVA
-                         ================================================ -->
+                    <!-- EVA -->
                     <div class="page" id="page-eva">
                         <div class="page-header">
                             <h1>🤖 EVA</h1>
@@ -955,9 +1258,7 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         REFRIGERAÇÃO
-                         ================================================ -->
+                    <!-- REFRIGERAÇÃO -->
                     <div class="page" id="page-refrigeracao">
                         <div class="page-header">
                             <h1>❄️ Refrigeração</h1>
@@ -973,9 +1274,7 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         RASTREABILIDADE
-                         ================================================ -->
+                    <!-- RASTREABILIDADE -->
                     <div class="page" id="page-rastreabilidade">
                         <div class="page-header">
                             <h1><i class="fas fa-route"></i> Rastreabilidade</h1>
@@ -991,9 +1290,7 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         DOCUMENTAÇÃO
-                         ================================================ -->
+                    <!-- DOCUMENTAÇÃO -->
                     <div class="page" id="page-documentacao">
                         <div class="page-header">
                             <h1>📒 Documentação</h1>
@@ -1008,9 +1305,7 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         SOBRE O VLT
-                         ================================================ -->
+                    <!-- SOBRE O VLT -->
                     <div class="page" id="page-sobre">
                         <div class="page-header">
                             <h1>ℹ️ Sobre</h1>
@@ -1057,9 +1352,7 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         CATÁLOGO
-                         ================================================ -->
+                    <!-- CATÁLOGO -->
                     <div class="page" id="page-catalogo">
                         <div class="page-header">
                             <h1>📚 Catálogo de Peças e Componentes</h1>
@@ -1094,22 +1387,8 @@
                         </div>
                     </div>
 
-                    <!-- ================================================
-                         PROGRAMAÇÃO
-                         ================================================ -->
-                    <div class="page" id="page-programacao">
-                        <div class="page-header">
-                            <h1>📅 Programação</h1>
-                            <p>Visualização da programação de atividades</p>
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQh0a-BMomvvOomRWYGlmoZSPG6ZuwF1jRXFrm8yhzMzizB9vWBgFiFBRyFBRRHQfVVoRppT3E8FBKS/pubhtml?gid=1564591852&single=true" target="_blank" class="btn-primary"><i class="fas fa-table"></i> Acessar Planilha</a>
-                            <button class="btn-primary" onclick="takePageScreenshot('programacao')" style="margin-left: 10px;"><i class="fas fa-camera"></i> Capturar Tela</button>
-                        </div>
-                        <div class="table-container" style="min-height: 650px;">
-                            <div class="loading-overlay" id="loading-programacao"><div class="spinner"></div></div>
-                            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTI602SZCvv3Vljbau78ZXFxNxUVQATWF1aefTd0rxh6zXpmhV9nDjmpimnDO5vkHLKpWZl82Kw4Gu2/pubhtml?gid=1888450540&single=true" frameborder="0" style="border: 0; width: 100%; height: 650px;" onload="document.getElementById('loading-programacao').classList.add('hidden')" allowfullscreen></iframe>
-                        </div>
+                    <!-- PROGRAMAÇÃO (mantida como page oculta para compatibilidade de hash) -->
+                    <div class="page" id="page-programacao" style="display:none !important;">
                     </div>
 
                 </div><!-- fim pages-wrapper -->
@@ -1121,9 +1400,7 @@
         </main>
     </div>
 
-    <!-- ================================================
-         MODAL PERFIL
-         ================================================ -->
+    <!-- MODAL PERFIL -->
     <div id="profileModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeProfileModal()">✕</button>
@@ -1143,9 +1420,7 @@
         </div>
     </div>
 
-    <!-- ================================================
-         MODAL SUPORTE
-         ================================================ -->
+    <!-- MODAL SUPORTE -->
     <div id="supportModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeSupportModal()">✕</button>
@@ -1159,9 +1434,7 @@
         </div>
     </div>
 
-    <!-- ================================================
-         MODAL FILTRO PASSAGEM
-         ================================================ -->
+    <!-- MODAL FILTRO PASSAGEM -->
     <div id="passagemFilterModal" class="modal">
         <div class="modal-content">
             <button class="modal-close" onclick="closePassagemFilterModal()">✕</button>
@@ -1208,7 +1481,6 @@
         console.log("🚀 Inicializando Dashboard SIGMA-MRO...");
         currentUser = checkAuth();
 
-        // Navegação via hash de URL (para SIGMA-HELP)
         function checkUrlHash() {
             const hash = window.location.hash;
             if (hash) {
@@ -1306,7 +1578,7 @@
             'novo_registro':  '➕ Novo Registro',
             'usuarios':       '👥 Usuários',
             'laboratorio':    '🧪 Laboratório',
-            'preventiva':     '🛡️ Preventiva',      // ← NOVO
+            'preventiva':     '🛡️ Preventiva',
             'eva':            '🤖 EVA',
             'refrigeracao':   '❄️ Refrigeração',
             'rastreabilidade':'🛰️ Rastreabilidade',
@@ -1320,10 +1592,8 @@
 
         document.getElementById('breadcrumb').textContent = titles[pageName] || pageName;
         updateMotivationalQuote();
-
         document.getElementById('screenshotBtn').style.display = 'none';
 
-        // Ações específicas por página
         if (pageName === 'passagem') {
             document.getElementById('passagem-filters').style.display = 'flex';
             loadPassagemData();
@@ -1335,40 +1605,61 @@
         if (pageName === 'documentacao') loadDocumentacao();
         if (pageName === 'catalogo')    showCatalogoPage();
 
-        // ── Quando entrar na aba Preventiva, sempre volta ao hub ──
+        // Ao entrar em Preventiva, sempre volta ao hub principal
         if (pageName === 'preventiva')  showPreventivaHub();
     }
 
     // ============================================================
-    // *** FUNÇÕES DA ABA PREVENTIVA ***
+    // *** NAVEGAÇÃO PREVENTIVA — NÍVEL 0 (hub principal) ***
     // ============================================================
-
-    /**
-     * Mostra uma seção específica dentro da aba Preventiva
-     * e esconde o hub principal.
-     * @param {string} section - Nome da seção (ex: 'pendencias')
-     */
-    function showPreventivaSection(section) {
-        // Esconde o hub
-        document.getElementById('preventiva-hub-view').style.display = 'none';
-        // Esconde todas as seções abertas
-        document.querySelectorAll('[id^="preventiva-section-"]').forEach(el => el.style.display = 'none');
-        // Abre a seção escolhida
-        const target = document.getElementById('preventiva-section-' + section);
-        if (target) {
-            target.style.display = 'block';
-        }
+    function showPreventivaHub() {
+        _hideAllPrevSections();
+        document.getElementById('preventiva-hub-view').style.display = 'block';
     }
 
-    /**
-     * Volta ao hub (menu de botões) dentro da aba Preventiva.
-     */
-    function showPreventivaHub() {
-        // Esconde todas as seções
-        document.querySelectorAll('[id^="preventiva-section-"]').forEach(el => el.style.display = 'none');
-        // Mostra o hub
-        const hub = document.getElementById('preventiva-hub-view');
-        if (hub) hub.style.display = 'block';
+    function showPreventivaSection(section) {
+        _hideAllPrevSections();
+        const el = document.getElementById('preventiva-section-' + section);
+        if (el) el.style.display = 'block';
+    }
+
+    function _hideAllPrevSections() {
+        document.getElementById('preventiva-hub-view').style.display = 'none';
+        const ids = [
+            'preventiva-section-pendencias',
+            'preventiva-section-pendencias-nova',
+            'preventiva-section-pendencias-tratativa',
+            'preventiva-section-pendencias-dados',
+            'preventiva-section-sheet-view',
+            'preventiva-section-programacao'
+        ];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+    }
+
+    // ============================================================
+    // *** NAVEGAÇÃO PREVENTIVA — NÍVEL 1 (Pendências sub-hub) ***
+    // ============================================================
+    function showPendenciasSection(section) {
+        _hideAllPrevSections();
+        const el = document.getElementById('preventiva-section-pendencias-' + section);
+        if (el) el.style.display = 'block';
+    }
+
+    // ============================================================
+    // *** VISUALIZAR PLANILHA EMBED ***
+    // ============================================================
+    function showPendenciasSheetEmbed(sheetKey, url, title) {
+        _hideAllPrevSections();
+        document.getElementById('preventiva-section-sheet-view').style.display = 'block';
+        document.getElementById('sheet-title').textContent = title;
+        document.getElementById('sheet-breadcrumb-name').textContent = title;
+        document.getElementById('sheet-open-btn').href = url;
+        // Reinicia loading
+        document.getElementById('loading-sheet-view').classList.remove('hidden');
+        document.getElementById('sheet-iframe').src = url;
     }
 
     // ============================================================
